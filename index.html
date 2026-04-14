@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#1c1c1e">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="SM Grup">
+
+<title>Milgrup · Dashboard</title>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon-v2.png">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root{--bg:#f2f2f7;--card:#fff;--text:#1c1c1e;--sub:#8e8e93;--sep:rgba(60,60,67,.1);--accent:#007aff;--ok:#34c759;--warn:#ff9f0a;--bad:#ff3b30;--r:12px}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,'SF Pro Text','Helvetica Neue',sans-serif;background:var(--bg);color:var(--text);padding-bottom:60px;font-size:14px}
+.topbar{position:sticky;top:0;z-index:99;background:rgba(242,242,247,.94);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);padding:10px 14px 8px;border-bottom:.5px solid var(--sep)}
+.topbar h1{font-size:15px;font-weight:700;letter-spacing:-.3px}
+.topbar p{font-size:11px;color:var(--sub)}
+.tabbar{position:fixed;bottom:0;left:0;right:0;z-index:99;background:rgba(248,248,248,.97);backdrop-filter:blur(16px);border-top:.5px solid var(--sep);display:flex;height:56px}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:9px;color:var(--sub);cursor:pointer;border:none;background:none;transition:color .15s}
+.tab.active{color:var(--accent)}.tab svg{width:20px;height:20px}
+.page{display:none;padding:8px 10px 4px;animation:fi .18s ease}
+.page.active{display:block}
+@keyframes fi{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
+.card{background:var(--card);border-radius:var(--r);margin-bottom:8px;overflow:hidden}
+.ch{padding:8px 12px 7px;border-bottom:.5px solid var(--sep);display:flex;align-items:center;justify-content:space-between}
+.ct{font-size:11px;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:.4px}
+.cb{padding:10px 12px}
+.krow{display:grid;gap:6px;margin-bottom:8px}
+.k2{grid-template-columns:1fr 1fr}.k3{grid-template-columns:1fr 1fr 1fr}
+.kpi{background:var(--card);border-radius:var(--r);padding:8px 10px}
+.kl{font-size:10px;color:var(--sub);margin-bottom:2px}
+.kv{font-size:20px;font-weight:700;letter-spacing:-.7px;line-height:1.1}
+.kv.ok{color:var(--ok)}.kv.warn{color:var(--warn)}.kv.bad{color:var(--bad)}
+.ks{font-size:10px;color:var(--sub);margin-top:1px}
+.pill{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:12px;font-weight:600}
+.pill.ok{background:rgba(52,199,89,.14);color:#1a7a37}
+.pill.warn{background:rgba(255,159,10,.14);color:#b36b00}
+.pill.bad{background:rgba(255,59,48,.14);color:#c0392b}
+.loc-sticky{position:sticky;top:52px;z-index:50;padding:6px 10px;background:rgba(242,242,247,.96);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:.5px solid var(--sep);margin:0 -10px 10px}
+.seg{display:flex;background:rgba(118,118,128,.12);border-radius:8px;padding:2px}
+.sb{flex:1;padding:5px 2px;border:none;background:none;font-size:10px;font-weight:500;color:var(--sub);border-radius:6px;cursor:pointer;transition:all .15s;text-align:center}
+.sb.active{background:var(--card);color:var(--text);font-weight:700;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.loc-banner{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:10px;margin-bottom:8px}
+.cw{position:relative;height:190px}
+.cws{position:relative;height:160px}
+.cwm{position:relative;height:175px}
+/* Taules dades */
+.dtbl{width:100%;border-collapse:collapse;font-size:10px}
+.dtbl th{color:var(--sub);font-weight:600;padding:3px 2px 4px;text-align:center;border-bottom:.5px solid var(--sep);white-space:nowrap;font-size:9px}
+.dtbl th:first-child{text-align:left;padding-left:2px;min-width:42px}
+.dtbl td{padding:3px 2px;text-align:center;border-bottom:.5px solid var(--sep);font-size:9px}
+.dtbl td:first-child{text-align:left;padding-left:2px;font-weight:600;font-size:9px;white-space:nowrap}
+.dtbl tr:last-child td{border-bottom:none}
+.dtbl .tot-col{font-weight:700;border-left:.5px solid var(--sep)}
+.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl th{font-size:10px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.3px;padding:5px 8px;border-bottom:.5px solid var(--sep);text-align:right}
+.tbl th:first-child{text-align:left}
+.tbl td{padding:6px 8px;border-bottom:.5px solid var(--sep);text-align:right}
+.tbl td:first-child{text-align:left;font-weight:500}
+.tbl tr:last-child td{border-bottom:none}
+.hm{display:grid;gap:2px}
+.hml{color:var(--sub);display:flex;align-items:center;font-size:9px;font-weight:600}
+.hmc{border-radius:4px;height:26px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700}
+.rg{display:grid;grid-template-columns:repeat(8,1fr);gap:2px;text-align:center}
+.rg .lbl{font-size:9px;font-weight:600;color:var(--sub);display:flex;align-items:center;font-size:9px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.day-row{display:flex;flex-direction:column;padding:5px 0;border-bottom:.5px solid var(--sep)}
+.day-row:last-child{border-bottom:none}
+.abs-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:.5px solid var(--sep)}
+.abs-row:last-child{border-bottom:none}
+</style>
+</head>
+<body>
+<div class="topbar"><h1><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 30" height="22" style="vertical-align:middle;margin-right:6px">
+  <defs><clipPath id="hci"><polygon points="30,2 43,9 43,23 30,30 17,23 17,9"/></clipPath></defs>
+  <polygon points="30,2 43,9 43,23 30,30 17,23 17,9" fill="#2d1b3d"/>
+  <g clip-path="url(#hci)">
+    <rect x="19" y="20" width="3" height="7" rx="1" fill="#c8a96e" opacity="0.5"/>
+    <rect x="23" y="16" width="3" height="11" rx="1" fill="#c8a96e" opacity="0.65"/>
+    <rect x="27" y="11" width="3" height="16" rx="1" fill="#c8a96e" opacity="0.85"/>
+    <rect x="31" y="14" width="3" height="13" rx="1" fill="#c8a96e" opacity="0.75"/>
+    <rect x="35" y="8" width="3" height="19" rx="1" fill="#c8a96e"/>
+    <polyline points="20,20 24,16 28,11 32,14 36,8" fill="none" stroke="#fff" stroke-width="0.8" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+  </g>
+</svg>Milgrup · Dashboard</h1><p>fw1–fw15 · 2026 · 4 locals</p></div>
+
+<div id="page-resum" class="page active">
+  <div class="card" style="margin-top:4px">
+    <div class="ch"><span class="ct">Resum per local · fw1–fw15 · 2026</span></div>
+    <div class="cb" style="padding:8px 10px"><div id="resum-taula"></div></div>
+  </div>
+  <div class="card">
+    <div class="ch"><span class="ct">Vendes setmanals per local (€)</span></div>
+    <div class="cb" style="padding:6px 4px 8px">
+      <div class="cw"><canvas id="cg"></canvas></div>
+      <div id="cg-taula" style="margin-top:6px;overflow-x:auto"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ch"><span class="ct">Ràtio Cost/Vendes per local (%)</span></div>
+    <div class="cb" style="padding:6px 4px 8px">
+      <div class="cws"><canvas id="cr"></canvas></div>
+      <div id="cr-taula" style="margin-top:6px;overflow-x:auto"></div>
+      <div style="display:flex;gap:10px;margin-top:4px;font-size:10px;padding-left:2px">
+        <span style="color:var(--ok)">▬ ≤35%</span><span style="color:var(--warn)">▬ 35–38%</span><span style="color:var(--bad)">▬ >38%</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="page-locals" class="page">
+  <div class="loc-sticky"><div class="seg" id="loc-seg"></div></div>
+  <div id="loc-detail"></div>
+</div>
+
+<div id="page-personal" class="page">
+  <div class="loc-sticky"><div class="seg" id="per-seg"></div></div>
+  <div id="per-detail"></div>
+</div>
+
+<div class="tabbar">
+  <button class="tab active" id="tab-resum" onclick="showPage('resum')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Resum
+  </button>
+  <button class="tab" id="tab-locals" onclick="showPage('locals')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Locals
+  </button>
+  <button class="tab" id="tab-personal" onclick="showPage('personal')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>Personal
+  </button>
+</div>
+
+<script>
+const DV={
+"SM Sarrià":{"color":"#1F3864","color2":"#4A90D9","total_vendes":297223,"total_cost":107912,"ratio":36.3,"dies":105,"fw_list":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15],"fw_vendes":[15196,18772,18063,15809,20929,18377,19535,20214,20713,18520,21323,22055,23131,21233,23354],"fw_cost":[7612,7906,7463,7506,7486,7866,7185,7180,7177,7324,7515,6617,6659,6260,6155],"fw_ratio":[50.1,42.1,41.3,47.5,35.8,42.8,36.8,35.5,34.6,39.5,35.2,30.0,28.8,29.5,26.4],"fw_ratio_acum":[50.1,45.7,44.2,44.9,42.8,42.8,41.9,41.0,40.2,40.1,39.6,38.7,37.8,37.2,36.3],"mitja_vendes":19815,"avg_dia_vendes":[2127,2198,2345,2437,3414,3657,3636],"avg_dia_ratio":[48.2,40.3,40.9,42.2,40.7,35.7,34.8],"heatmap":{"Matí":[66,59,58,30,45,182,323],"Migdia":[904,906,1052,805,1146,1541,2039],"Tarda":[237,267,233,251,513,451,507],"Nit":[920,967,1001,1351,1710,1484,767]},"top5":[{"data":"28/03","dia":"Ds","v":5283,"r":23.5},{"data":"15/03","dia":"Dg","v":4866,"r":26.7},{"data":"13/03","dia":"Dv","v":4756,"r":22.8},{"data":"21/03","dia":"Ds","v":4675,"r":27.2},{"data":"10/04","dia":"Dv","v":4577,"r":20.4}],"bottom5":[{"data":"02/01","dia":"Dv","v":674,"r":156.4},{"data":"19/01","dia":"Dl","v":708,"r":125.3},{"data":"02/02","dia":"Dl","v":1096,"r":82.3},{"data":"07/01","dia":"Dc","v":1341,"r":75.0},{"data":"16/03","dia":"Dl","v":1360,"r":47.5}]},
+"SM Sabadell":{"color":"#1E6B3C","color2":"#5DBE8A","total_vendes":268824,"total_cost":106258,"ratio":39.5,"dies":105,"fw_list":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15],"fw_vendes":[26815,19681,12981,16399,17976,16665,16920,18557,18099,15348,15818,16786,18062,21985,16733],"fw_cost":[6722,6695,6281,5473,6443,7016,7605,7932,7318,7851,7566,7283,7120,7252,7701],"fw_ratio":[25.1,34.0,48.4,33.4,35.8,42.1,44.9,42.7,40.4,51.2,47.8,43.4,39.4,33.0,46.0],"fw_ratio_acum":[25.1,28.9,33.1,33.2,33.7,35.0,36.3,37.1,37.5,38.6,39.4,39.7,39.7,39.1,39.5],"mitja_vendes":17922,"avg_dia_vendes":[1775,1600,1538,1706,3448,5137,2717],"avg_dia_ratio":[51.6,62.9,51.8,50.4,42.9,29.8,44.6],"heatmap":{"Matí":[0,0,0,0,0,0,0],"Migdia":[748,624,534,567,839,2000,1500],"Tarda":[0,0,0,0,0,0,0],"Nit":[1027,976,1004,1138,2609,3137,1192]},"top5":[{"data":"31/01","dia":"Ds","v":7056,"r":22.1},{"data":"14/02","dia":"Ds","v":5905,"r":30.2},{"data":"11/04","dia":"Ds","v":5892,"r":29.6},{"data":"30/12","dia":"Dt","v":5825,"r":11.6},{"data":"07/02","dia":"Ds","v":5794,"r":27.3}],"bottom5":[{"data":"17/02","dia":"Dt","v":693,"r":129.8},{"data":"13/01","dia":"Dt","v":746,"r":85.3},{"data":"12/02","dia":"Dj","v":757,"r":103.4},{"data":"02/03","dia":"Dl","v":763,"r":101.8},{"data":"08/01","dia":"Dj","v":929,"r":70.9}]},
+"Picu Sabadell":{"color":"#7B3F00","color2":"#E07B30","total_vendes":246217,"total_cost":100293,"ratio":40.7,"dies":101,"fw_list":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15],"fw_vendes":[24330,18978,13051,7339,16624,15332,15374,17872,17272,16486,13767,16916,16798,19781,16296],"fw_cost":[7892,6936,6509,3408,6937,6647,7351,7294,7401,6950,6596,5665,6684,7334,6688],"fw_ratio":[32.4,36.5,49.9,46.4,41.7,43.4,47.8,40.8,42.9,42.2,47.9,33.5,39.8,37.1,41.0],"fw_ratio_acum":[32.4,34.2,37.9,38.8,39.4,40.1,41.1,41.1,41.3,41.4,41.9,41.2,41.1,40.7,40.7],"mitja_vendes":16414,"avg_dia_vendes":[1881,1513,1472,1915,2851,4275,2959],"avg_dia_ratio":[54.7,75.9,56.4,48.3,48.9,33.0,28.4],"heatmap":{"Matí":[0,0,0,0,0,0,0],"Migdia":[1154,892,875,1150,1086,1894,1711],"Tarda":[0,0,0,0,0,0,0],"Nit":[727,621,597,764,1765,2381,1225]},"top5":[{"data":"14/02","dia":"Ds","v":6456,"r":24.0},{"data":"31/01","dia":"Ds","v":6260,"r":23.3},{"data":"28/02","dia":"Ds","v":5895,"r":27.8},{"data":"30/12","dia":"Dt","v":5228,"r":23.5},{"data":"07/03","dia":"Ds","v":5084,"r":24.7}],"bottom5":[{"data":"10/02","dia":"Dt","v":680,"r":164.4},{"data":"24/02","dia":"Dt","v":712,"r":116.9},{"data":"07/04","dia":"Dt","v":837,"r":97.1},{"data":"27/01","dia":"Dt","v":837,"r":96.8},{"data":"09/03","dia":"Dl","v":865,"r":95.6}]},
+"Picu StCugat":{"color":"#5B4A8A","color2":"#A98FD8","total_vendes":153863,"total_cost":72558,"ratio":47.2,"dies":75,"fw_list":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15],"fw_vendes":[6270,12660,7814,8388,14406,9530,11542,11944,10359,10341,10095,10530,11277,7028,11679],"fw_cost":[2682,5089,3706,3411,4474,4163,4747,5219,4981,6051,6170,5164,5702,5628,5371],"fw_ratio":[42.8,40.2,47.4,40.7,31.1,43.7,41.1,43.7,48.1,58.5,61.1,49.0,50.6,80.1,46.0],"fw_ratio_acum":[42.8,41.1,42.9,42.4,39.1,39.8,40.0,40.6,41.4,43.1,44.7,45.1,45.5,47.3,47.2],"mitja_vendes":10258,"avg_dia_vendes":[2346,1379,1215,1523,2148,3346,2022],"avg_dia_ratio":[30.4,37.5,94.6,92.3,54.7,43.7,45.9],"heatmap":{"Matí":[0,0,0,0,0,0,0],"Migdia":[0,1379,504,579,596,1660,1658],"Tarda":[0,0,0,0,0,0,0],"Nit":[2346,0,711,944,1552,1685,365]},"top5":[{"data":"31/01","dia":"Ds","v":5126,"r":25.2},{"data":"07/03","dia":"Ds","v":5107,"r":31.2},{"data":"14/02","dia":"Ds","v":4337,"r":33.9},{"data":"24/01","dia":"Ds","v":4173,"r":28.8},{"data":"28/02","dia":"Ds","v":3541,"r":39.2}],"bottom5":[{"data":"22/01","dia":"Dj","v":151,"r":569.5},{"data":"04/02","dia":"Dc","v":272,"r":224.2},{"data":"11/03","dia":"Dc","v":350,"r":319.5},{"data":"05/04","dia":"Dg","v":392,"r":150.9},{"data":"31/12","dia":"Dc","v":566,"r":72.7}]}
+};
+
+const GRUP_V=[72611,70091,51909,47935,69935,59904,63371,68587,66443,60695,61003,66287,69268,70027,68062];
+const GRUP_C=[24908,27626,24959,19798,27340,26692,26888,27625,26877,27176,27847,25729,26165,26474,26015];
+const GRUP_RATIO=[34.3,39.4,48.1,41.3,39.1,44.6,42.4,40.3,40.5,44.8,45.7,38.8,37.8,37.8,38.2];
+const GRUP_ACUM=[34.3,36.1,38.8,39.3,38.6,39.3,39.7,39.8,39.9,40.5,41.0,40.7,40.4,40.2,40.1];
+
+const DP={
+"SM Sarrià":{"tot_hcoc":2761,"tot_hsal":2918,"tot_h":5680,"tot_cost":107912,"fw_list":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15],"fw_hcoc":[186,203,193,186,193,199,186,182,181,185,186,169,172,159,161],"fw_hsal":[215,214,200,209,200,215,192,198,196,201,211,179,179,171,154],"fw_htot":[401,417,393,395,394,414,379,379,378,386,397,348,350,330,314],"fw_cost_p":[7612,7906,7463,7506,7466,7866,7185,7180,7173,7328,7543,6610,6658,6268,5968],"torn_coc":{"Matí":324,"Migdia":1073,"Tarda":381,"Nit":983},"torn_sal":{"Matí":312,"Migdia":892,"Tarda":418,"Nit":1295},"avg_dia_hcoc":[28,27,26,25,27,30,26],"avg_dia_hsal":[29,26,25,25,31,38,28],
+"absencies":{"tot_dies":252,"tot_cost":12096,"per_tipus":[{"nom":"Baixa per malaltia","dies":149,"cost":7152},{"nom":"Accident laboral","dies":87,"cost":4176},{"nom":"Absència injustificada","dies":16,"cost":768}],"top_absents":[{"nom":"José Lazo Mendoza","dies":75,"tipus":"Baja/Acc."},{"nom":"Gabriela Pachuri Camacho","dies":75,"tipus":"Baja"},{"nom":"Fabian Figueroa Arevalo","dies":59,"tipus":"Baja"},{"nom":"Lucas Velazquez","dies":17,"tipus":"Acc./Inj."},{"nom":"Fioder Feltes Estigarribia","dies":15,"tipus":"Baja/Inj."}]}},
+"SM Sabadell":{"tot_hcoc":2680,"tot_hsal":2912,"tot_h":5593,"tot_cost":106258,"fw_list":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15],"fw_hcoc":[151,175,162,141,169,176,183,195,188,203,197,182,178,186,191],"fw_hsal":[223,196,169,147,171,195,218,223,206,211,202,201,197,199,214],"fw_htot":[374,372,331,288,340,371,401,418,393,414,399,383,376,386,405],"fw_cost_p":[6722,6695,6281,5473,6443,7016,7605,7932,7318,7851,7566,7283,7120,7252,7701],"torn_coc":{"Matí":0,"Migdia":1298,"Tarda":0,"Nit":1382},"torn_sal":{"Matí":0,"Migdia":1412,"Tarda":0,"Nit":1500},"avg_dia_hcoc":[0,25,22,20,25,37,30],"avg_dia_hsal":[0,26,24,22,27,42,36],
+"absencies":{"tot_dies":128,"tot_cost":6144,"per_tipus":[{"nom":"Baixa per malaltia","dies":119,"cost":5712},{"nom":"Absència injustificada","dies":5,"cost":240},{"nom":"Permís defunció","dies":4,"cost":192}],"top_absents":[{"nom":"Karoline Alvez Durval","dies":58,"tipus":"Baja"},{"nom":"Miquel Perez Cuartero","dies":56,"tipus":"Baja"},{"nom":"Ferran Sibecas i Ribera","dies":4,"tipus":"Inj."},{"nom":"Alex Lacalaz","dies":4,"tipus":"Permís"},{"nom":"Gonzalo Mendez","dies":3,"tipus":"Baja/Inj."}]}},
+"Picu Sabadell":{"tot_hcoc":2448,"tot_hsal":2867,"tot_h":5314,"tot_cost":100970,"fw_list":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15],"fw_hcoc":[178,162,148,89,163,158,172,181,178,168,152,142,163,178,170],"fw_hsal":[237,201,195,90,204,192,215,205,212,199,196,156,190,209,165],"fw_htot":[415,364,343,180,367,351,388,386,391,367,348,299,353,387,335],"fw_cost_p":[7892,6936,6509,3408,6937,6647,7351,7294,7401,6950,6596,5665,6684,7334,6688],"torn_coc":{"Matí":0,"Migdia":1198,"Tarda":0,"Nit":1250},"torn_sal":{"Matí":0,"Migdia":1387,"Tarda":0,"Nit":1480},"avg_dia_hcoc":[0,24,20,20,24,38,33],"avg_dia_hsal":[0,28,25,23,28,46,38],
+"absencies":{"tot_dies":81,"tot_cost":3888,"per_tipus":[{"nom":"Baixa per malaltia","dies":53,"cost":2544},{"nom":"Absència no remunerada","dies":18,"cost":864},{"nom":"Absència injustificada","dies":10,"cost":480}],"top_absents":[{"nom":"Paula Daniela Portales Porcel","dies":35,"tipus":"Baja"},{"nom":"Adriana Corina Prieto Ferro","dies":20,"tipus":"Baja/No rem."},{"nom":"Sebastian Pulgarin Gonzalez","dies":6,"tipus":"Inj."},{"nom":"Yvelisse Plasencio Solano","dies":4,"tipus":"No rem."},{"nom":"David Rafael Ramirez Torres","dies":4,"tipus":"No rem./Inj."}]}},
+"Picu StCugat":{"tot_hcoc":1411,"tot_hsal":2479,"tot_h":3889,"tot_cost":73898,"fw_list":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15],"fw_hcoc":[52,93,68,63,86,78,89,97,92,113,118,98,108,108,104],"fw_hsal":[89,175,127,117,149,141,161,178,170,206,207,173,192,188,178],"fw_htot":[141,268,195,180,235,219,250,274,262,319,325,271,300,296,283],"fw_cost_p":[2682,5089,3706,3411,4474,4163,4747,5219,4981,6051,6170,5164,5702,5628,5371],"torn_coc":{"Matí":0,"Migdia":632,"Tarda":0,"Nit":779},"torn_sal":{"Matí":0,"Migdia":1165,"Tarda":0,"Nit":1314},"avg_dia_hcoc":[12,0,8,8,10,18,14],"avg_dia_hsal":[22,0,14,14,18,32,25],
+"absencies":{"tot_dies":2,"tot_cost":96,"per_tipus":[{"nom":"Absència autoritzada","dies":1,"cost":48},{"nom":"Absència injustificada","dies":1,"cost":48}],"top_absents":[{"nom":"Sergi Sans Llopis","dies":1,"tipus":"Autoritzada"},{"nom":"Rossana Sosa Gonzalez","dies":1,"tipus":"Inj."}]}}
+};
+
+const CTX={"28/03":"🌤️ Dissabte de Setmana Santa","15/03":"🌤️ Diumenge · bon temps","13/03":"🌦️ Divendres · setmana forta","21/03":"☀️ Primer dia de primavera","10/04":"🌤️ Divendres Sant · pont festiu","02/01":"🌧️ Post-Cap d'Any · activitat mínima","19/01":"🌧️ Dilluns de gener","02/02":"🌨️ Dilluns fred · febrer baix","07/01":"🌧️ Post-Reis · molt baix","16/03":"🌦️ Dilluns · inici setmana","31/01":"🌤️ Dissabte · festa local Sabadell","14/02":"💝 Dissabte Sant Valentí","11/04":"🌤️ Dissabte de Pasqua","30/12":"🎉 Pre-Cap d'Any · nit forta","07/02":"🌤️ Dissabte · caps forts","17/02":"🌧️ Dimarts · Carnaval amb pluja","13/01":"🌨️ Dimarts fred de gener","12/02":"🌧️ Dijous fred i vent","02/03":"🌧️ Dilluns temporada baixa","08/01":"🌧️ Post-Reis · activitat mínima","28/02":"🌤️ Dissabte fort de febrer","07/03":"☀️ Dissabte · bon temps de març","10/02":"🌧️ Dimarts · pluja intensa","24/02":"🌧️ Dimarts · Carnaval baix","07/04":"🌧️ Dimarts Setmana Santa","27/01":"🌨️ Dimarts fred de gener","09/03":"🌧️ Dilluns temps variable","24/01":"🌤️ Dissabte · temporada bona","22/01":"🌧️ Dijous fred · obertura parcial","04/02":"🌨️ Dimecres fred","11/03":"🌧️ Dimecres plujós","05/04":"🌧️ Diumenge Pasqua · tancament","31/12":"🎉 Cap d'Any · torn reduït"};
+
+const LOCS=['SM Sarrià','SM Sabadell','Picu Sabadell','Picu StCugat'];
+const DIES=['Dl','Dt','Dc','Dj','Dv','Ds','Dg'];
+const TORNS_V=['Matí','Migdia','Tarda','Nit'];
+const GCOLS=['#1F3864','#1E6B3C','#E07B30','#9B6BD4'];
+let curLoc='SM Sarrià',curPer='SM Sarrià',charts={};
+
+const sf=r=>r<=35?'ok':r<=38?'warn':'bad';
+const si=r=>r<=35?'🟢':r<=38?'🟡':'🔴';
+const rc=r=>r<=35?'var(--ok)':r<=38?'var(--warn)':'var(--bad)';
+const rcbg=r=>r<=35?'rgba(52,199,89,.12)':r<=38?'rgba(255,159,10,.12)':'rgba(255,59,48,.12)';
+const fmt=n=>Math.round(n).toLocaleString('ca-ES');
+const pc=n=>parseFloat(n).toFixed(1)+'%';
+const dk=k=>{if(charts[k]){charts[k].destroy();delete charts[k]}};
+
+function showPage(p){
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  document.getElementById('page-'+p).classList.add('active');
+  document.getElementById('tab-'+p).classList.add('active');
+  if(p==='resum')renderResum();
+  if(p==='locals'){buildSeg('loc-seg',curLoc,selLocal);renderLocDetail();}
+  if(p==='personal'){buildSeg('per-seg',curPer,selPer);renderPerDetail();}
+  window.scrollTo(0,0);
+}
+
+function buildSeg(id,cur,fn){
+  document.getElementById(id).innerHTML=LOCS.map((l,i)=>`<button class="sb${l===cur?' active':''}" onclick="${fn.name}('${l}')">${l.replace('SM Sarrià','Sarrià').replace('SM Sabadell','Sabadell').replace('Picu ','P.')}</button>`).join('');
+}
+function selLocal(l){curLoc=l;buildSeg('loc-seg',l,selLocal);renderLocDetail();window.scrollTo(0,52);}
+function selPer(l){curPer=l;buildSeg('per-seg',l,selPer);renderPerDetail();window.scrollTo(0,52);}
+
+// ── RESUM ─────────────────────────────────────────────────────────────────
+function renderResum(){
+  const totV=Object.values(DV).reduce((s,d)=>s+d.total_vendes,0);
+  const totC=Object.values(DV).reduce((s,d)=>s+d.total_cost,0);
+  const totR=totC/totV*100;
+
+  // Taula resum: Local | Vendes | Cost | Ràtio | Dies
+  let html=`<table class="dtbl" style="font-size:11px">
+    <thead><tr>
+      <th style="text-align:left">Local</th>
+      <th>Vendes</th><th>Cost</th><th>Ràtio C/V</th><th>Dies</th>
+    </tr></thead><tbody>`;
+  LOCS.forEach((l,i)=>{
+    const d=DV[l];
+    html+=`<tr style="cursor:pointer" onclick="selLocal('${l}');showPage('locals')">
+      <td><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${GCOLS[i]};margin-right:4px"></span>${l}</td>
+      <td style="font-weight:600">${fmt(d.total_vendes)}€</td>
+      <td>${fmt(d.total_cost)}€</td>
+      <td style="font-weight:700;color:${rc(d.ratio)}">${pc(d.ratio)} ${si(d.ratio)}</td>
+      <td style="color:var(--sub)">${d.dies}</td>
+    </tr>`;
+  });
+  html+=`<tr style="border-top:.5px solid var(--sep);background:rgba(0,0,0,0.02)">
+    <td style="font-weight:700">TOTAL</td>
+    <td style="font-weight:700">${fmt(totV)}€</td>
+    <td style="font-weight:700">${fmt(totC)}€</td>
+    <td style="font-weight:700;color:${rc(totR)}">${pc(totR)} ${si(totR)}</td>
+    <td style="color:var(--sub)">—</td>
+  </tr></tbody></table>`;
+  document.getElementById('resum-taula').innerHTML=html;
+
+  const fws=DV['SM Sarrià'].fw_list.map(f=>'fw'+f);
+  const mitjes=LOCS.reduce((o,l)=>{const fw=DV[l].fw_vendes;o[l]=fw.reduce((a,b)=>a+b,0)/fw.length;return o},{});
+
+  // Gràfic vendes: línies per local + línia total grup (eix secundari per no desvirtuar)
+  dk('cg');
+  charts['cg']=new Chart(document.getElementById('cg').getContext('2d'),{
+    type:'line',
+    data:{labels:fws,datasets:[
+      ...LOCS.map((l,i)=>({label:l,data:DV[l].fw_vendes,borderColor:GCOLS[i],backgroundColor:'transparent',borderWidth:2,pointRadius:2,tension:.3,yAxisID:'y'})),
+      {label:'Total grup',data:GRUP_V,borderColor:'#aaa',backgroundColor:'transparent',borderWidth:1.5,borderDash:[4,3],pointRadius:2,tension:.3,yAxisID:'y2'}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:true,position:'bottom',labels:{font:{size:9},boxWidth:8,padding:5}},tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${fmt(ctx.raw)}€`}}},
+      scales:{
+        x:{grid:{display:false},ticks:{font:{size:8}}},
+        y:{position:'left',grid:{color:'rgba(0,0,0,0.03)'},ticks:{font:{size:8},callback:v=>fmt(v)+'€'},title:{display:true,text:'Per local',font:{size:8},color:'var(--sub)'}},
+        y2:{position:'right',grid:{display:false},ticks:{font:{size:8},callback:v=>(v/1000).toFixed(0)+'k€'},title:{display:true,text:'Grup',font:{size:8},color:'#aaa'}}
+      }
+    }
+  });
+
+  // Taula vendes: local x fw + total + mitja, colors per vs mitja
+  let tV=`<table class="dtbl"><thead><tr><th>Local</th>${fws.map(f=>`<th>${f}</th>`).join('')}<th class="tot-col">Total</th><th class="tot-col">Mitja/fw</th></tr></thead><tbody>`;
+  LOCS.forEach((l,i)=>{
+    const mitja=mitjes[l];
+    tV+=`<tr><td style="color:${GCOLS[i]}">${l.replace('SM ','').replace('Picu ','P.')}</td>`;
+    DV[l].fw_vendes.forEach(v=>{
+      const p=(v-mitja)/mitja;
+      const bg=p>0.1?'rgba(52,199,89,.15)':p>-0.1?'':'rgba(255,59,48,.13)';
+      const tc=p>0.1?'#1a7a37':p>-0.1?'var(--text)':'#c0392b';
+      tV+=`<td style="background:${bg};color:${tc}${p!==0?';font-weight:600':''}">${(v/1000).toFixed(0)}k</td>`;
+    });
+    tV+=`<td class="tot-col" style="font-weight:700">${fmt(DV[l].total_vendes)}€</td>`;
+    tV+=`<td class="tot-col" style="color:var(--sub)">${fmt(DV[l].mitja_vendes)}€</td>`;
+    tV+='</tr>';
+  });
+  // Fila total grup
+  tV+=`<tr style="border-top:.5px solid var(--sep)"><td style="font-weight:700">Grup</td>`;
+  GRUP_V.forEach(v=>tV+=`<td style="font-weight:600">${(v/1000).toFixed(0)}k</td>`);
+  tV+=`<td class="tot-col" style="font-weight:700">${fmt(GRUP_V.reduce((a,b)=>a+b,0))}€</td>`;
+  tV+=`<td class="tot-col" style="color:var(--sub)">${fmt(Math.round(GRUP_V.reduce((a,b)=>a+b,0)/GRUP_V.length))}€</td>`;
+  tV+='</tr></tbody></table>';
+  document.getElementById('cg-taula').innerHTML=tV;
+
+  // Gràfic ràtio
+  dk('cr');
+  charts['cr']=new Chart(document.getElementById('cr').getContext('2d'),{
+    type:'line',
+    data:{labels:fws,datasets:LOCS.map((l,i)=>({label:l,data:DV[l].fw_ratio,borderColor:GCOLS[i],backgroundColor:'transparent',borderWidth:2,pointRadius:2,tension:.3}))},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:true,position:'bottom',labels:{font:{size:9},boxWidth:8,padding:5}},tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${ctx.raw}%`}}},
+      scales:{x:{grid:{display:false},ticks:{font:{size:8}}},y:{grid:{color:'rgba(0,0,0,0.03)'},ticks:{font:{size:8},callback:v=>v+'%'},min:20,max:65}}
+    }
+  });
+
+  // Taula ràtio: fw + total acumulat + ràtio acumulat
+  let tR=`<table class="dtbl"><thead><tr><th>Local</th>${fws.map(f=>`<th>${f}</th>`).join('')}<th class="tot-col">Acum.</th></tr></thead><tbody>`;
+  // Ràtio setmanal per local
+  LOCS.forEach((l,i)=>{
+    tR+=`<tr><td style="color:${GCOLS[i]}">${l.replace('SM ','').replace('Picu ','P.')}</td>`;
+    DV[l].fw_ratio.forEach(r=>tR+=`<td style="color:${rc(r)};font-weight:600">${r}%</td>`);
+    tR+=`<td class="tot-col" style="font-weight:700;color:${rc(DV[l].ratio)}">${pc(DV[l].ratio)}</td>`;
+    tR+='</tr>';
+  });
+  // Separador
+  tR+=`<tr><td colspan="${fws.length+2}" style="padding:3px 0;border-bottom:.5px solid var(--sep);font-size:9px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.3px">Ràtio acumulat (fw1→fwN)</td></tr>`;
+  LOCS.forEach((l,i)=>{
+    tR+=`<tr><td style="color:${GCOLS[i]}">${l.replace('SM ','').replace('Picu ','P.')}</td>`;
+    DV[l].fw_ratio_acum.forEach(r=>tR+=`<td style="color:${rc(r)};font-weight:600">${r}%</td>`);
+    tR+=`<td class="tot-col" style="font-weight:700;color:${rc(DV[l].ratio)}">${pc(DV[l].ratio)}</td>`;
+    tR+='</tr>';
+  });
+  // Grup acumulat
+  tR+=`<tr style="border-top:.5px solid var(--sep)"><td style="font-weight:700">Grup</td>`;
+  GRUP_ACUM.forEach(r=>tR+=`<td style="color:${rc(r)};font-weight:600">${r}%</td>`);
+  tR+=`<td class="tot-col" style="font-weight:700;color:${rc(GRUP_ACUM[GRUP_ACUM.length-1])}">${pc(GRUP_ACUM[GRUP_ACUM.length-1])}</td>`;
+  tR+='</tr></tbody></table>';
+  document.getElementById('cr-taula').innerHTML=tR;
+}
+
+// ── LOCALS ────────────────────────────────────────────────────────────────
+function renderLocDetail(){
+  const d=DV[curLoc];
+  const col=GCOLS[LOCS.indexOf(curLoc)];
+  const fws=d.fw_list.map(f=>'fw'+f);
+  const mitjaV=d.mitja_vendes;
+
+  document.getElementById('loc-detail').innerHTML=`
+    <div class="loc-banner" style="background:${col}12;border-left:4px solid ${col}">
+      <div style="width:10px;height:10px;border-radius:50%;background:${col};flex-shrink:0"></div>
+      <div style="flex:1">
+        <div style="font-size:15px;font-weight:700;color:${col}">${curLoc}</div>
+        <div style="font-size:11px;color:${col};opacity:.75">${d.dies} dies · fw1–fw15 · 2026</div>
+      </div>
+    </div>
+    <div class="krow k3" style="margin-bottom:8px">
+      <div class="kpi"><div class="kl">Vendes netes</div><div class="kv" style="font-size:16px">${fmt(d.total_vendes)}€</div><div class="ks">Mitja ${fmt(mitjaV)}€/fw</div></div>
+      <div class="kpi"><div class="kl">Cost personal</div><div class="kv" style="font-size:16px">${fmt(d.total_cost)}€</div></div>
+      <div class="kpi"><div class="kl">Ràtio C/V</div><div class="kv ${sf(d.ratio)}">${pc(d.ratio)} ${si(d.ratio)}</div></div>
+    </div>
+
+    <div class="card">
+      <div class="ch"><span class="ct">Vendes · Cost · Ràtio per setmana</span></div>
+      <div class="cb" style="padding:6px 4px 8px">
+        <div class="cwm"><canvas id="c-lm"></canvas></div>
+        <div id="lm-taula" style="margin-top:6px;overflow-x:auto"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ch"><span class="ct">Vendes per torn i dia (€ mitjà/dia)</span></div>
+      <div class="cb" style="padding:6px 4px 8px">
+        <div class="cws"><canvas id="c-ld"></canvas></div>
+        <div id="ld-taula" style="margin-top:6px;overflow-x:auto"></div>
+        <div style="margin-top:6px">${ratioGrid(d)}</div>
+      </div>
+    </div>
+
+    <div class="g2">
+      <div class="card">
+        <div class="ch"><span class="ct" style="color:var(--ok)">Top 5 ⬆</span></div>
+        <div class="cb" style="padding:4px 10px">${topRows(d.top5,false)}</div>
+      </div>
+      <div class="card">
+        <div class="ch"><span class="ct" style="color:var(--bad)">Bottom 5 ⬇</span></div>
+        <div class="cb" style="padding:4px 10px">${topRows(d.bottom5,true)}</div>
+      </div>
+    </div>
+  `;
+
+  setTimeout(()=>{
+    dk('clm');
+    charts['clm']=new Chart(document.getElementById('c-lm').getContext('2d'),{
+      type:'bar',
+      data:{labels:fws,datasets:[
+        {type:'bar',label:'Vendes',data:d.fw_vendes,backgroundColor:d.fw_vendes.map(v=>{const p=(v-mitjaV)/mitjaV;return p>0.1?'rgba(52,199,89,.75)':p>-0.1?col+'99':'rgba(255,59,48,.65)';}),borderRadius:3,borderSkipped:false,yAxisID:'y'},
+        {type:'bar',label:'Cost',data:d.fw_cost,backgroundColor:d.color2+'88',borderRadius:3,borderSkipped:false,yAxisID:'y'},
+        {type:'line',label:'Ràtio %',data:d.fw_ratio,borderColor:'#ff9f0a',backgroundColor:'transparent',borderWidth:2,pointRadius:3,pointBackgroundColor:d.fw_ratio.map(r=>rc(r)),tension:.3,yAxisID:'y2'},
+        {type:'line',label:'Ràtio acum.',data:d.fw_ratio_acum,borderColor:'#aaa',backgroundColor:'transparent',borderWidth:1.5,borderDash:[3,3],pointRadius:2,tension:.3,yAxisID:'y2'},
+      ]},
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:true,position:'bottom',labels:{font:{size:9},boxWidth:9,padding:4}},tooltip:{callbacks:{label:ctx=>ctx.dataset.label.includes('%')||ctx.dataset.label.includes('Ràtio')?`${ctx.dataset.label}: ${ctx.raw}%`:`${ctx.dataset.label}: ${fmt(ctx.raw)}€`}}},
+        scales:{x:{grid:{display:false},ticks:{font:{size:7}}},y:{position:'left',grid:{color:'rgba(0,0,0,0.03)'},ticks:{font:{size:8},callback:v=>fmt(v)+'€'}},y2:{position:'right',grid:{display:false},ticks:{font:{size:8},callback:v=>v+'%'},min:20,max:65}}
+      }
+    });
+
+    // Taula fw: vendes (color), cost, ràtio, ràtio acum + total columna
+    const totV=d.fw_vendes.reduce((a,b)=>a+b,0);
+    const totC=d.fw_cost.reduce((a,b)=>a+b,0);
+    let tw=`<table class="dtbl"><thead><tr><th></th>${fws.map(f=>`<th>${f}</th>`).join('')}<th class="tot-col">Total</th></tr></thead><tbody>`;
+    tw+=`<tr><td style="color:${col}">Vendes</td>${d.fw_vendes.map(v=>{const p=(v-mitjaV)/mitjaV;const bg=p>0.1?'rgba(52,199,89,.13)':p>-0.1?'':'rgba(255,59,48,.12)';const tc=p>0.1?'#1a7a37':p>-0.1?'var(--text)':'#c0392b';return`<td style="background:${bg};color:${tc};font-weight:600">${(v/1000).toFixed(0)}k</td>`}).join('')}<td class="tot-col" style="font-weight:700">${fmt(totV)}€</td></tr>`;
+    tw+=`<tr><td style="color:${d.color2}">Cost</td>${d.fw_cost.map(v=>`<td>${(v/1000).toFixed(0)}k</td>`).join('')}<td class="tot-col" style="font-weight:700">${fmt(totC)}€</td></tr>`;
+    tw+=`<tr><td style="color:#ff9f0a">Ràtio</td>${d.fw_ratio.map(r=>`<td style="color:${rc(r)};font-weight:600">${r}%</td>`).join('')}<td class="tot-col" style="color:${rc(d.ratio)};font-weight:700">${pc(d.ratio)}</td></tr>`;
+    tw+=`<tr><td style="color:#aaa">Acum.</td>${d.fw_ratio_acum.map(r=>`<td style="color:${rc(r)}">${r}%</td>`).join('')}<td class="tot-col" style="color:${rc(d.ratio)};font-weight:700">${pc(d.ratio)}</td></tr>`;
+    tw+='</tbody></table>';
+    document.getElementById('lm-taula').innerHTML=tw;
+
+    // Gràfic dies barres+línia
+    dk('cld');
+    charts['cld']=new Chart(document.getElementById('c-ld').getContext('2d'),{
+      type:'bar',
+      data:{labels:DIES,datasets:[
+        {type:'bar',label:'Vendes',data:d.avg_dia_vendes,backgroundColor:DIES.map((_,i)=>i>=4?col+'ee':col+'66'),borderRadius:4,borderSkipped:false,yAxisID:'y'},
+        {type:'line',label:'Ràtio %',data:d.avg_dia_ratio,borderColor:'#ff9f0a',backgroundColor:'transparent',borderWidth:2.5,pointRadius:4,pointBackgroundColor:d.avg_dia_ratio.map(r=>rc(r)),tension:.3,yAxisID:'y2'},
+      ]},
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:true,position:'bottom',labels:{font:{size:9},boxWidth:9,padding:4}},tooltip:{callbacks:{label:ctx=>ctx.dataset.label==='Ràtio %'?`Ràtio: ${ctx.raw}%`:`Vendes: ${fmt(ctx.raw)}€`}}},
+        scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{position:'left',grid:{color:'rgba(0,0,0,0.03)'},ticks:{font:{size:8},callback:v=>fmt(v)+'€'}},y2:{position:'right',grid:{display:false},ticks:{font:{size:8},callback:v=>v+'%'},min:20}}
+      }
+    });
+
+    // Taula torn x dia SENSE colors, amb total per torn
+    const hm=d.heatmap;
+    const ta=TORNS_V.filter(t=>hm[t]&&hm[t].some(v=>v>0));
+    let tdT=`<table class="dtbl"><thead><tr><th>Torn</th>${DIES.map(di=>`<th>${di}</th>`).join('')}<th class="tot-col">Total setm.</th></tr></thead><tbody>`;
+    ta.forEach(t=>{
+      const totT=hm[t].reduce((a,b)=>a+b,0);
+      tdT+=`<tr><td style="color:${col};font-weight:700">${t}</td>`;
+      hm[t].forEach(v=>tdT+=`<td>${v>0?fmt(v):'—'}</td>`);
+      tdT+=`<td class="tot-col" style="font-weight:700">${fmt(totT)}€</td></tr>`;
+    });
+    tdT+='</tbody></table>';
+    document.getElementById('ld-taula').innerHTML=tdT;
+  },50);
+}
+
+function ratioGrid(d){
+  // Grid 8 columnes: etiqueta + 7 dies, perfectament alineat
+  return`<div style="display:grid;grid-template-columns:40px repeat(7,1fr);gap:2px;align-items:center">
+    <div style="font-size:9px;color:var(--sub);font-weight:600">Ràtio C/V</div>
+    ${DIES.map((di,i)=>{const r=d.avg_dia_ratio[i];return`<div style="background:${rcbg(r)};border-radius:6px;padding:4px 2px;text-align:center"><div style="font-size:9px;font-weight:600;color:var(--sub)">${di}</div><div style="font-size:12px;font-weight:700;color:${rc(r)}">${r}%</div></div>`;}).join('')}
+  </div>`;
+}
+
+function topRows(rows,bad){
+  return rows.map(r=>`<div class="day-row">
+    <div style="display:flex;justify-content:space-between">
+      <span style="font-size:12px;font-weight:700">${r.data} <span style="color:var(--sub);font-size:10px">${r.dia}</span></span>
+      <span style="font-size:12px;font-weight:700">${fmt(r.v)}€</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-top:1px">
+      <span style="font-size:10px;color:var(--sub)">${CTX[r.data]||''}</span>
+      <span style="font-size:11px;font-weight:600;color:${bad?'var(--bad)':rc(r.r)}">${r.r}%</span>
+    </div>
+  </div>`).join('');
+}
+
+// ── PERSONAL ──────────────────────────────────────────────────────────────
+function renderPerDetail(){
+  const p=DP[curPer];
+  const v=DV[curPer];
+  const col=GCOLS[LOCS.indexOf(curPer)];
+  const fws=p.fw_list.map(f=>'fw'+f);
+  const ratH=Math.round(p.tot_hcoc/p.tot_h*100);
+
+  const tornsActius=Object.entries(p.torn_coc).filter(([t,h])=>h>0||(p.torn_sal[t]||0)>0);
+
+  document.getElementById('per-detail').innerHTML=`
+    <div class="loc-banner" style="background:${col}12;border-left:4px solid ${col}">
+      <div style="width:10px;height:10px;border-radius:50%;background:${col};flex-shrink:0"></div>
+      <div style="flex:1">
+        <div style="font-size:15px;font-weight:700;color:${col}">${curPer}</div>
+        <div style="font-size:11px;color:${col};opacity:.75">Personal · fw1–fw15 · 2026</div>
+      </div>
+    </div>
+    <div class="krow k3" style="margin-bottom:8px">
+      <div class="kpi"><div class="kl">Total hores</div><div class="kv" style="font-size:17px">${fmt(p.tot_h)}h</div></div>
+      <div class="kpi"><div class="kl">Cost personal</div><div class="kv" style="font-size:17px">${fmt(p.tot_cost)}€</div></div>
+      <div class="kpi"><div class="kl">Ràtio C/V</div><div class="kv ${sf(v.ratio)}">${pc(v.ratio)} ${si(v.ratio)}</div></div>
+    </div>
+    <div class="krow k2" style="margin-bottom:8px">
+      <div class="kpi"><div class="kl">Hores cuina</div><div class="kv" style="font-size:18px;color:${col}">${fmt(p.tot_hcoc)}h</div><div class="ks">${ratH}% del total</div></div>
+      <div class="kpi"><div class="kl">Hores sala</div><div class="kv" style="font-size:18px;color:${col}99">${fmt(p.tot_hsal)}h</div><div class="ks">${100-ratH}% del total</div></div>
+    </div>
+
+    <div class="card">
+      <div class="ch"><span class="ct">Hores cuina i sala per setmana</span></div>
+      <div class="cb" style="padding:6px 4px 8px">
+        <div class="cwm"><canvas id="c-ph"></canvas></div>
+        <div id="ph-taula" style="margin-top:6px;overflow-x:auto"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ch"><span class="ct">Hores per torn (cuina i sala)</span></div>
+      <div class="cb" style="padding:6px 12px">${tornTaula(p,col)}</div>
+    </div>
+
+    <div class="card">
+      <div class="ch"><span class="ct">Hores per dia de la setmana</span></div>
+      <div class="cb" style="padding:6px 4px 8px">
+        <div class="cws"><canvas id="c-pd"></canvas></div>
+        <div style="margin-top:6px;overflow-x:auto">${horesDiaTaula(p,col)}</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ch">
+        <span class="ct">Absències</span>
+        <span style="font-size:12px;font-weight:700;color:var(--bad)">${p.absencies.tot_dies}d · ${fmt(p.absencies.tot_cost)}€ cost est.</span>
+      </div>
+      <div class="cb" style="padding:6px 12px">
+        <div style="font-size:10px;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:.3px;margin-bottom:6px">Per tipus</div>
+        ${p.absencies.per_tipus.map(a=>`
+          <div class="abs-row">
+            <div><div style="font-size:13px;font-weight:600">${a.nom}</div><div style="font-size:10px;color:var(--sub)">${a.dies} dies</div></div>
+            <div style="text-align:right"><div style="font-size:13px;font-weight:700;color:var(--bad)">${fmt(a.cost)}€</div><div style="font-size:10px;color:var(--sub)">cost est.</div></div>
+          </div>`).join('')}
+        <div style="height:.5px;background:var(--sep);margin:8px 0"></div>
+        <div style="font-size:10px;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:.3px;margin-bottom:6px">Persones amb més absències</div>
+        <table class="tbl">
+          <thead><tr><th style="text-align:left">Persona</th><th>Dies</th><th>Tipus</th><th>Cost est.</th></tr></thead>
+          <tbody>
+            ${p.absencies.top_absents.map((a,i)=>`
+              <tr>
+                <td style="font-size:12px">${a.nom}</td>
+                <td style="font-weight:700;color:var(--bad)">${a.dies}d</td>
+                <td style="font-size:10px;color:var(--sub)">${a.tipus}</td>
+                <td style="color:var(--bad)">${fmt(a.dies*8*6)}€</td>
+              </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+
+  setTimeout(()=>{
+    dk('cph');
+    charts['cph']=new Chart(document.getElementById('c-ph').getContext('2d'),{
+      type:'bar',
+      data:{labels:fws,datasets:[
+        {label:'Cuina',data:p.fw_hcoc,backgroundColor:col+'cc',borderRadius:3,borderSkipped:false,stack:'h'},
+        {label:'Sala',data:p.fw_hsal,backgroundColor:col+'55',borderRadius:3,borderSkipped:false,stack:'h'},
+      ]},
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:true,position:'bottom',labels:{font:{size:9},boxWidth:9,padding:5}}},
+        scales:{x:{stacked:true,grid:{display:false},ticks:{font:{size:7}}},y:{stacked:true,grid:{color:'rgba(0,0,0,0.03)'},ticks:{font:{size:8},callback:v=>v+'h'}}}
+      }
+    });
+
+    let th=`<table class="dtbl"><thead><tr><th></th>${fws.map(f=>`<th>${f}</th>`).join('')}<th class="tot-col">Total</th></tr></thead><tbody>`;
+    th+=`<tr><td style="color:${col}">Cuina</td>${p.fw_hcoc.map(v=>`<td>${v}h</td>`).join('')}<td class="tot-col" style="font-weight:700">${fmt(p.tot_hcoc)}h</td></tr>`;
+    th+=`<tr><td style="color:${col}99">Sala</td>${p.fw_hsal.map(v=>`<td>${v}h</td>`).join('')}<td class="tot-col" style="font-weight:700">${fmt(p.tot_hsal)}h</td></tr>`;
+    th+=`<tr><td style="font-weight:700">Total</td>${p.fw_htot.map(v=>`<td style="font-weight:700">${v}h</td>`).join('')}<td class="tot-col" style="font-weight:700">${fmt(p.tot_h)}h</td></tr>`;
+    th+=`<tr><td style="color:var(--sub)">Cost</td>${p.fw_cost_p.map(v=>`<td>${(v/1000).toFixed(0)}k€</td>`).join('')}<td class="tot-col" style="font-weight:700">${fmt(p.tot_cost)}€</td></tr>`;
+    th+='</tbody></table>';
+    document.getElementById('ph-taula').innerHTML=th;
+
+    dk('cpd');
+    charts['cpd']=new Chart(document.getElementById('c-pd').getContext('2d'),{
+      type:'bar',
+      data:{labels:DIES,datasets:[
+        {label:'Cuina',data:p.avg_dia_hcoc,backgroundColor:col+'cc',borderRadius:3,borderSkipped:false,stack:'h'},
+        {label:'Sala',data:p.avg_dia_hsal,backgroundColor:col+'55',borderRadius:3,borderSkipped:false,stack:'h'},
+      ]},
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:true,position:'bottom',labels:{font:{size:9},boxWidth:9,padding:5}}},
+        scales:{x:{stacked:true,grid:{display:false},ticks:{font:{size:10}}},y:{stacked:true,grid:{color:'rgba(0,0,0,0.03)'},ticks:{font:{size:8},callback:v=>v+'h'}}}
+      }
+    });
+  },50);
+}
+
+function tornTaula(p,col){
+  const torns=['Matí','Migdia','Tarda','Nit'];
+  const actius=torns.filter(t=>(p.torn_coc[t]||0)+(p.torn_sal[t]||0)>0);
+  return`<table class="tbl">
+    <thead><tr><th>Torn</th><th>Cuina</th><th>Sala</th><th>Total</th></tr></thead>
+    <tbody>${actius.map(t=>{const c=p.torn_coc[t]||0,s=p.torn_sal[t]||0,tot=c+s;
+      return`<tr><td>${t}</td><td>${fmt(c)}h</td><td>${fmt(s)}h</td><td style="font-weight:700">${fmt(tot)}h</td></tr>`;
+    }).join('')}
+    <tr style="background:rgba(0,0,0,0.02)"><td style="font-weight:700">Total</td><td style="font-weight:700">${fmt(p.tot_hcoc)}h</td><td style="font-weight:700">${fmt(p.tot_hsal)}h</td><td style="font-weight:700">${fmt(p.tot_h)}h</td></tr>
+    </tbody></table>`;
+}
+
+function horesDiaTaula(p,col){
+  return`<table class="dtbl"><thead><tr><th></th>${DIES.map(d=>`<th>${d}</th>`).join('')}<th class="tot-col">Total</th></tr></thead><tbody>
+    <tr><td style="color:${col}">Cuina</td>${p.avg_dia_hcoc.map(v=>`<td>${v>0?v+'h':'—'}</td>`).join('')}<td class="tot-col" style="font-weight:700">${fmt(p.tot_hcoc)}h</td></tr>
+    <tr><td style="color:${col}99">Sala</td>${p.avg_dia_hsal.map(v=>`<td>${v>0?v+'h':'—'}</td>`).join('')}<td class="tot-col" style="font-weight:700">${fmt(p.tot_hsal)}h</td></tr>
+    <tr><td style="font-weight:700">Total</td>${p.avg_dia_hcoc.map((c,i)=>{const t=c+(p.avg_dia_hsal[i]||0);return`<td style="font-weight:700">${t>0?t+'h':'—'}</td>`}).join('')}<td class="tot-col" style="font-weight:700">${fmt(p.tot_h)}h</td></tr>
+  </tbody></table>`;
+}
+
+renderResum();
+</script>
+</body>
+</html>
