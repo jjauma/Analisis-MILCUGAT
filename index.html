@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#1c1c1e">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="SM Grup">
+
+<title>Milgrup · Dashboard</title>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon-v2.png">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root{--bg:#f2f2f7;--card:#fff;--text:#1c1c1e;--sub:#8e8e93;--sep:rgba(60,60,67,.1);--accent:#007aff;--ok:#34c759;--warn:#ff9f0a;--bad:#ff3b30;--r:12px}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,'SF Pro Text','Helvetica Neue',sans-serif;background:var(--bg);color:var(--text);padding-bottom:60px;font-size:14px}
+.topbar{position:sticky;top:0;z-index:99;background:rgba(242,242,247,.94);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);padding:8px 14px 6px;border-bottom:.5px solid var(--sep);display:flex;align-items:center;justify-content:space-between}
+.topbar-left h1{font-size:15px;font-weight:700;letter-spacing:-.3px}
+.topbar-left p{font-size:11px;color:var(--sub)}
+.tabbar{position:fixed;bottom:0;left:0;right:0;z-index:99;background:rgba(248,248,248,.97);backdrop-filter:blur(16px);border-top:.5px solid var(--sep);display:flex;height:56px}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:9px;color:var(--sub);cursor:pointer;border:none;background:none;transition:color .15s}
+.tab.active{color:var(--accent)}.tab svg{width:20px;height:20px}
+.page{display:none;padding:8px 10px 4px;animation:fi .18s ease}
+.page.active{display:block}
+@keyframes fi{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
+.card{background:var(--card);border-radius:var(--r);margin-bottom:8px;overflow:hidden}
+.ch{padding:8px 12px 7px;border-bottom:.5px solid var(--sep);display:flex;align-items:center;justify-content:space-between}
+.ct{font-size:11px;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:.4px}
+.cb{padding:10px 12px}
+.krow{display:grid;gap:6px;margin-bottom:8px}
+.k2{grid-template-columns:1fr 1fr}.k3{grid-template-columns:1fr 1fr 1fr}
+.kpi{background:var(--card);border-radius:var(--r);padding:8px 10px}
+.kl{font-size:10px;color:var(--sub);margin-bottom:2px}
+.kv{font-size:20px;font-weight:700;letter-spacing:-.7px;line-height:1.1}
+.kv.ok{color:var(--ok)}.kv.warn{color:var(--warn)}.kv.bad{color:var(--bad)}
+.ks{font-size:10px;color:var(--sub);margin-top:1px}
+.pill{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:12px;font-weight:600}
+.pill.ok{background:rgba(52,199,89,.14);color:#1a7a37}
+.pill.warn{background:rgba(255,159,10,.14);color:#b36b00}
+.pill.bad{background:rgba(255,59,48,.14);color:#c0392b}
+.loc-sticky{position:sticky;top:52px;z-index:50;padding:6px 10px;background:rgba(242,242,247,.96);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:.5px solid var(--sep);margin:0 -10px 10px}
+.seg{display:flex;background:rgba(118,118,128,.12);border-radius:8px;padding:2px}
+.sb{flex:1;padding:5px 2px;border:none;background:none;font-size:10px;font-weight:500;color:var(--sub);border-radius:6px;cursor:pointer;transition:all .15s;text-align:center}
+.sb.active{background:var(--card);color:var(--text);font-weight:700;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.loc-banner{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:10px;margin-bottom:8px}
+.cw{position:relative;height:190px}
+.cws{position:relative;height:160px}
+.cwm{position:relative;height:175px}
+.dtbl{width:100%;border-collapse:collapse;font-size:10px}
+.dtbl th{color:var(--sub);font-weight:600;padding:3px 2px 4px;text-align:center;border-bottom:.5px solid var(--sep);white-space:nowrap;font-size:9px}
+.dtbl th:first-child{text-align:left;padding-left:2px;min-width:42px}
+.dtbl td{padding:3px 2px;text-align:center;border-bottom:.5px solid var(--sep);font-size:9px}
+.dtbl td:first-child{text-align:left;padding-left:2px;font-weight:600;font-size:9px;white-space:nowrap}
+.dtbl tr:last-child td{border-bottom:none}
+.dtbl .tot-col{font-weight:700;border-left:.5px solid var(--sep)}
+.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl th{font-size:10px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.3px;padding:5px 8px;border-bottom:.5px solid var(--sep);text-align:right}
+.tbl th:first-child{text-align:left}
+.tbl td{padding:6px 8px;border-bottom:.5px solid var(--sep);text-align:right}
+.tbl td:first-child{text-align:left;font-weight:500}
+.tbl tr:last-child td{border-bottom:none}
+.hm{display:grid;gap:2px}
+.hml{color:var(--sub);display:flex;align-items:center;font-size:9px;font-weight:600}
+.hmc{border-radius:4px;height:26px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700}
+.rg{display:grid;grid-template-columns:repeat(8,1fr);gap:2px;text-align:center}
+.rg .lbl{font-size:9px;font-weight:600;color:var(--sub);display:flex;align-items:center;font-size:9px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.day-row{display:flex;flex-direction:column;padding:5px 0;border-bottom:.5px solid var(--sep)}
+.day-row:last-child{border-bottom:none}
+.abs-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:.5px solid var(--sep)}
+.abs-row:last-child{border-bottom:none}
+</style>
+</head>
+<body>
+<div id="login-overlay" style="display:none;position:fixed;inset:0;z-index:999;background:#1c1c1e;flex-direction:column;align-items:center;justify-content:center;padding:24px">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 30" height="48" style="margin-bottom:16px">
+    <defs><clipPath id="hci2"><polygon points="30,2 43,9 43,23 30,30 17,23 17,9"/></clipPath></defs>
+    <polygon points="30,2 43,9 43,23 30,30 17,23 17,9" fill="#2d1b3d"/>
+    <g clip-path="url(#hci2)">
+      <rect x="19" y="20" width="3" height="7" rx="1" fill="#c8a96e" opacity="0.5"/>
+      <rect x="23" y="16" width="3" height="11" rx="1" fill="#c8a96e" opacity="0.65"/>
+      <rect x="27" y="11" width="3" height="16" rx="1" fill="#c8a96e" opacity="0.85"/>
+      <rect x="31" y="14" width="3" height="13" rx="1" fill="#c8a96e" opacity="0.75"/>
+      <rect x="35" y="8" width="3" height="19" rx="1" fill="#c8a96e"/>
+      <polyline points="20,20 24,16 28,11 32,14 36,8" fill="none" stroke="#fff" stroke-width="0.8" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+    </g>
+  </svg>
+  <div style="color:#fff;font-size:20px;font-weight:700;letter-spacing:-.4px;margin-bottom:4px">Milgrup · Dashboard</div>
+  <div style="color:#8e8e93;font-size:13px;margin-bottom:32px">Accés restringit</div>
+  <div style="width:100%;max-width:320px;display:flex;flex-direction:column;gap:12px">
+    <input id="login-pin" type="password" inputmode="numeric" placeholder="Introdueix el teu PIN" maxlength="8"
+      style="width:100%;padding:14px 16px;border-radius:12px;border:none;background:#2c2c2e;color:#fff;font-size:16px;text-align:center;letter-spacing:4px;outline:none"
+      onkeydown="if(event.key==='Enter')doLogin()">
+    <button onclick="doLogin()"
+      style="width:100%;padding:14px;border-radius:12px;border:none;background:#007aff;color:#fff;font-size:16px;font-weight:600;cursor:pointer">
+      Entrar
+    </button>
+    <div id="login-error" style="color:#ff3b30;font-size:13px;text-align:center;min-height:18px"></div>
+  </div>
+</div>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <h1><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 30" height="22" style="vertical-align:middle;margin-right:6px">
+  <defs><clipPath id="hci"><polygon points="30,2 43,9 43,23 30,30 17,23 17,9"/></clipPath></defs>
+  <polygon points="30,2 43,9 43,23 30,30 17,23 17,9" fill="#2d1b3d"/>
+  <g clip-path="url(#hci)">
+    <rect x="19" y="20" width="3" height="7" rx="1" fill="#c8a96e" opacity="0.5"/>
+    <rect x="23" y="16" width="3" height="11" rx="1" fill="#c8a96e" opacity="0.65"/>
+    <rect x="27" y="11" width="3" height="16" rx="1" fill="#c8a96e" opacity="0.85"/>
+    <rect x="31" y="14" width="3" height="13" rx="1" fill="#c8a96e" opacity="0.75"/>
+    <rect x="35" y="8" width="3" height="19" rx="1" fill="#c8a96e"/>
+    <polyline points="20,20 24,16 28,11 32,14 36,8" fill="none" stroke="#fff" stroke-width="0.8" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+  </g>
+</svg>Milgrup · Dashboard</h1>
+    <p>fw1–fw16 · 2026 · 4 locals</p>
+  </div>
+  <button onclick="doLogout()" style="border:none;background:none;color:var(--sub);font-size:11px;cursor:pointer;padding:4px 8px;border-radius:8px;white-space:nowrap;flex-shrink:0">
+    <span id="user-label"></span><br><span style="font-size:10px;opacity:.7">Sortir</span>
+  </button>
+</div>
+
+<div id="page-resum" class="page active">
+  <div class="card" style="margin-top:4px">
+    <div class="ch"><span class="ct">Resum per local · fw1–fw16 · 2026</span></div>
+    <div class="cb" style="padding:8px 10px"><div id="resum-taula"></div></div>
+  </div>
+  <div class="card">
+    <div class="ch"><span class="ct">Vendes netes setmanals per local (€)</span></div>
+    <div class="cb" style="padding:6px 4px 8px">
+      <div class="cw"><canvas id="cg"></canvas></div>
+      <div id="cg-taula" style="margin-top:6px;overflow-x:auto"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ch"><span class="ct">Ràtio P/V acumulat per local · fw1→fwN (%)</span></div>
+    <div class="cb" style="padding:6px 4px 8px">
+      <div class="cws"><canvas id="cr"></canvas></div>
+      <div id="cr-taula" style="margin-top:6px;overflow-x:auto"></div>
+      <div style="display:flex;gap:10px;margin-top:4px;font-size:10px;padding-left:2px">
+        <span style="color:var(--ok)">▬ ≤35%</span><span style="color:var(--warn)">▬ 35–38%</span><span style="color:var(--bad)">▬ >38%</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="page-locals" class="page">
+  <div class="loc-sticky"><div class="seg" id="loc-seg"></div></div>
+  <div id="loc-detail"></div>
+</div>
+
+<div id="page-personal" class="page">
+  <div class="loc-sticky"><div class="seg" id="per-seg"></div></div>
+  <div id="per-detail"></div>
+</div>
+
+<div id="page-productes" class="page">
+  <div class="loc-sticky">
+    <div class="seg" id="prod-seg">
+      <button class="sb active" onclick="showProdSec('articles')">Articles</button>
+      <button class="sb" onclick="showProdSec('families')">Famílies</button>
+    </div>
+  </div>
+  <div id="prod-detail"></div>
+</div>
+
+<div class="tabbar">
+  <button class="tab active" id="tab-resum" onclick="showPage('resum')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Resum
+  </button>
+  <button class="tab" id="tab-locals" onclick="showPage('locals')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Locals
+  </button>
+  <button class="tab" id="tab-personal" onclick="showPage('personal')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>Personal
+  </button>
+  <button class="tab" id="tab-productes" onclick="showPage('productes')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>Productes
+  </button>
+</div>
+
+<script>
+const USERS = [
+  {nom:'Josep Maria', pin:'1234', rol:'admin',   local:null,            tabs:['resum','locals','personal','productes'], seccions:[]},
+  {nom:'Soci',        pin:'5678', rol:'soci',    local:null,            tabs:['resum','locals','productes'],            seccions:[]},
+  {nom:'Mgr.Sarrià',  pin:'9111', rol:'manager', local:'SM Sarrià',    tabs:['locals','personal','productes'],          seccions:[]},
+  {nom:'Mgr.Sabadell',pin:'9222', rol:'manager', local:'SM Sabadell',  tabs:['locals','personal','productes'],          seccions:[]},
+  {nom:'Mgr.PSbd',    pin:'9333', rol:'manager', local:'Picu Sabadell',tabs:['locals','personal','productes'],          seccions:[]},
+  {nom:'Mgr.PStC',    pin:'9444', rol:'manager', local:'Picu StCugat', tabs:['locals','personal','productes'],          seccions:[]},
+];
+
+let SESSION = null;
+
+function initAuth(){
+  const saved = localStorage.getItem('mg_session');
+  if(saved){
+    try{
+      const s = JSON.parse(saved);
+      const u = USERS.find(u=>u.pin===s.pin && u.nom===s.nom);
+      if(u){ SESSION=u; applySession(); return; }
+    }catch(e){}
+  }
+  document.getElementById('login-overlay').style.display='flex';
+}
+
+function doLogin(){
+  const pin = document.getElementById('login-pin').value.trim();
+  const u = USERS.find(u=>u.pin===pin);
+  if(!u){ document.getElementById('login-error').textContent='PIN incorrecte'; return; }
+  localStorage.setItem('mg_session', JSON.stringify({pin:u.pin,nom:u.nom}));
+  SESSION = u;
+  document.getElementById('login-overlay').style.display='none';
+  applySession();
+}
+
+function doLogout(){
+  localStorage.removeItem('mg_session');
+  SESSION=null;
+  location.reload();
+}
+
+function applySession(){
+  const u = SESSION;
+  document.getElementById('user-label').textContent = u.nom;
+  ['resum','locals','personal','productes'].forEach(t=>{
+    const el=document.getElementById('tab-'+t);
+    if(el) el.style.display = u.tabs.includes(t)?'':'none';
+  });
+  if(u.local){ curLoc = u.local; curPer = u.local; }
+  const primera = u.tabs[0];
+  showPage(primera);
+  if(!u.local) renderResum();
+}
+
+const DV={"SM Sarrià":{"color":"#1F3864","color2":"#4A90D9","total_vendes":322321,"total_cost":115717,"ratio":35.9,"dies":112,"fw_list":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16],"fw_vendes":[15196,18772,18063,15809,20929,18377,19535,20214,20713,18520,21323,22055,23131,21233,23354,25097],"fw_cost":[7612,7906,7463,7506,7486,7866,7185,7180,7177,7324,7515,6617,6659,6830,6725,6665],"fw_ratio":[50.1,42.1,41.3,47.5,35.8,42.8,36.8,35.5,34.6,39.5,35.2,30.0,28.8,32.2,28.8,26.6],"fw_ratio_acum":[50.1,45.7,44.2,44.9,42.8,42.8,41.9,41.0,40.2,40.1,39.6,38.7,37.8,37.4,36.7,35.9],"mitja_vendes":2878,"avg_dia_vendes":[2092,2188,2392,2460,3511,3771,3731],"avg_dia_ratio":[40.2,38.1,38.4,40.6,32.7,33.5,32.9],"heatmap":{"Matí":[991,879,871,461,677,3065,5201],"Migdia":[14052,14573,16809,12807,18844,25665,32924],"Tarda":[3654,4167,3890,4003,8506,7150,8273],"Nit":[14775,15393,16701,22091,28145,24457,13297]},"top5":[{"data":"18/04","dia":"Ds","v":5479,"r":22.7},{"data":"28/03","dia":"Ds","v":5283,"r":23.5},{"data":"19/04","dia":"Dg","v":5155,"r":20.8},{"data":"17/04","dia":"Dv","v":4955,"r":22.2},{"data":"15/03","dia":"Dg","v":4866,"r":26.7}],"bottom5":[{"data":"02/01","dia":"Dv","v":674,"r":156.4},{"data":"19/01","dia":"Dl","v":708,"r":125.3},{"data":"02/02","dia":"Dl","v":1096,"r":82.3},{"data":"07/01","dia":"Dc","v":1341,"r":75.0},{"data":"16/03","dia":"Dl","v":1360,"r":47.5}]},"SM Sabadell":{"color":"#1E6B3C","color2":"#5DBE8A","total_vendes":285307,"total_cost":115750,"ratio":40.6,"dies":112,"fw_list":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16],"fw_vendes":[26815,19681,12981,16017,17976,16665,16920,18557,18099,15348,15818,16786,18062,21985,16733,16865],"fw_cost":[6722,6695,6281,5473,6443,7016,7605,7932,7318,7851,7566,7663,7500,7632,8081,7971],"fw_ratio":[25.1,34.0,48.4,34.2,35.8,42.1,44.9,42.7,40.4,51.2,47.8,45.7,41.5,34.7,48.3,47.3],"fw_ratio_acum":[25.1,28.9,33.1,33.3,33.8,35.1,36.4,37.2,37.6,38.7,39.5,40.0,40.1,39.6,40.1,40.6],"mitja_vendes":2547,"avg_dia_vendes":[1711,1544,1519,1697,3478,5228,2654],"avg_dia_ratio":[44.0,50.5,51.1,46.3,42.0,29.7,42.4],"heatmap":{"Matí":[0,0,0,0,0,0,0],"Migdia":[11575,9581,8328,8698,13284,32004,23802],"Tarda":[0,0,0,0,0,0,0],"Nit":[15808,15122,15979,18457,42365,51640,18664]},"top5":[{"data":"31/01","dia":"Ds","v":7056,"r":22.1},{"data":"18/04","dia":"Ds","v":6589,"r":28.4},{"data":"14/02","dia":"Ds","v":5905,"r":30.2},{"data":"11/04","dia":"Ds","v":5892,"r":31.2},{"data":"30/12","dia":"Dt","v":5825,"r":11.6}],"bottom5":[{"data":"17/02","dia":"Dt","v":693,"r":129.8},{"data":"14/04","dia":"Dt","v":697,"r":98.4},{"data":"13/01","dia":"Dt","v":746,"r":85.3},{"data":"12/02","dia":"Dj","v":757,"r":103.4},{"data":"13/04","dia":"Dl","v":758,"r":95.4}]},"Picu Sabadell":{"color":"#7B3F00","color2":"#E07B30","total_vendes":262860,"total_cost":107371,"ratio":40.8,"dies":108,"fw_list":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16],"fw_vendes":[24330,18978,13051,7339,16274,15332,15374,17872,17272,16486,13767,16916,16798,19781,16296,16993],"fw_cost":[7892,6936,6509,3408,6937,6647,7351,7294,7401,6950,6596,5665,6684,7334,6688,7078],"fw_ratio":[32.4,36.5,49.9,46.4,42.6,43.4,47.8,40.8,42.8,42.2,47.9,33.5,39.8,37.1,41.0,41.7],"fw_ratio_acum":[32.4,34.2,37.9,38.8,39.6,40.2,41.3,41.2,41.4,41.5,42.0,41.2,41.1,40.8,40.8,40.8],"mitja_vendes":2434,"avg_dia_vendes":[1900,1533,1452,1920,2852,4264,2932],"avg_dia_ratio":[48.2,57.2,56.0,45.5,46.2,31.0,27.5],"heatmap":{"Matí":[0,0,0,0,0,0,0],"Migdia":[17537,13509,13283,17187,17297,30007,27342],"Tarda":[0,0,0,0,0,0,0],"Nit":[10969,9486,8503,11606,28342,38222,19570]},"top5":[{"data":"14/02","dia":"Ds","v":6456,"r":24.0},{"data":"31/01","dia":"Ds","v":6260,"r":23.3},{"data":"28/02","dia":"Ds","v":5895,"r":27.8},{"data":"30/12","dia":"Dt","v":5228,"r":23.5},{"data":"07/03","dia":"Ds","v":5084,"r":24.7}],"bottom5":[{"data":"10/02","dia":"Dt","v":680,"r":164.4},{"data":"24/02","dia":"Dt","v":712,"r":116.9},{"data":"07/04","dia":"Dt","v":837,"r":97.1},{"data":"27/01","dia":"Dt","v":837,"r":96.8},{"data":"09/03","dia":"Dl","v":865,"r":95.6}]},"Picu StCugat":{"color":"#5B4A8A","color2":"#A98FD8","total_vendes":164152,"total_cost":76111,"ratio":46.4,"dies":80,"fw_list":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16],"fw_vendes":[6270,12660,7814,8388,14406,9530,11542,11944,10359,10341,10095,10530,11277,7028,11679,10289],"fw_cost":[2682,5089,3706,3411,4474,4163,4747,5219,4981,6051,6170,4784,5322,5248,4991,5073],"fw_ratio":[42.8,40.2,47.4,40.7,31.1,43.7,41.1,43.7,48.1,58.5,61.1,45.4,47.2,74.7,42.7,49.3],"fw_ratio_acum":[42.8,41.1,42.9,42.4,39.1,39.8,40.0,40.6,41.4,43.1,44.7,44.8,45.0,46.5,46.2,46.4],"mitja_vendes":2052,"avg_dia_vendes":[2346,1379,1200,1529,2134,3397,1996],"avg_dia_ratio":[30.4,37.5,67.0,56.6,52.2,38.5,35.6],"heatmap":{"Matí":[0,0,0,0,0,0,0],"Migdia":[0,1379,8030,8439,8952,27089,26466],"Tarda":[0,0,0,0,0,0,0],"Nit":[2346,0,11164,14497,23058,27260,5471]},"top5":[{"data":"31/01","dia":"Ds","v":5126,"r":25.2},{"data":"07/03","dia":"Ds","v":5107,"r":31.2},{"data":"14/02","dia":"Ds","v":4337,"r":33.9},{"data":"24/01","dia":"Ds","v":4173,"r":28.8},{"data":"18/04","dia":"Ds","v":4167,"r":31.1}],"bottom5":[{"data":"22/01","dia":"Dj","v":151,"r":569.5},{"data":"04/02","dia":"Dc","v":272,"r":224.2},{"data":"11/03","dia":"Dc","v":350,"r":319.5},{"data":"05/04","dia":"Dg","v":392,"r":131.5},{"data":"31/12","dia":"Dc","v":566,"r":72.7}]}};
+const DP={"SM Sarrià":{"tot_hcoc":2983,"tot_hsal":3107,"tot_h":6090,"tot_hvac":85,"fw_hvac":[40.0,86.0,58.6,57.1,44.3,0.0,40.0,60.0,57.1,30.0,0.0,40.0,40.0,40.0,40.0,48.0],"fw_hvac_coc":[40.0,40.0,28.6,40.0,44.3,0.0,40.0,40.0,40.0,30.0,0.0,40.0,40.0,40.0,40.0,40.0],"fw_hvac_sal":[0.0,46.0,30.0,17.2,0.0,0.0,0.0,20.0,17.2,0.0,0.0,0.0,0.0,0.0,0.0,8.0],"tot_cost":115717,"fw_list":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16],"fw_hcoc":[186,203,193,189,197,220,193,194,191,195,206,157,159,172,166,162],"fw_hsal":[215,213,200,206,197,194,185,184,186,190,189,191,192,188,188,189],"fw_htot":[401,416,393,395,394,414,378,378,378,385,396,348,350,360,354,351],"fw_cost_p":[7612,7906,7463,7506,7486,7866,7185,7180,7177,7324,7515,6617,6659,6830,6725,6665],"torn_coc":{"Matí":333,"Migdia":1164,"Tarda":416,"Nit":1070},"torn_sal":{"Matí":273,"Migdia":1198,"Tarda":440,"Nit":1196},"avg_dia_hcoc":[22,22,25,27,31,30,30],"avg_dia_hsal":[23,22,23,26,30,37,35],"absencies":{"fw_vacances":[40.0,86.0,58.6,57.1,44.3,0.0,40.0,60.0,57.1,30.0,0.0,40.0,40.0,40.0,40.0,48.0],"fw_baixa":[60.0,30.0,30.0,62.0,70.0,70.0,70.0,88.0,94.0,70.0,70.0,70.0,52.0,100.0,82.0,87.0],"fw_accident":[8.0,30.0,30.0,30.0,30.0,30.0,30.0,30.0,30.0,30.0,36.0,60.0,90.0,30.0,30.0,30.0],"fw_injust":[0.0,0.0,4.0,0.0,0.0,24.0,0.0,14.0,0.0,0.0,0.0,7.0,4.0,11.0,8.0,4.0],"fw_altres":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"tot_vacances":681.1,"tot_baixa":1105.0,"tot_accident":554.0,"tot_injust":76.0,"tot_altres":0.0,"cost_baixa":6630,"cost_accident":3324,"cost_total":9954,"fw_hvac_total":[40.0,86.0,58.6,57.1,44.3,0.0,40.0,60.0,57.1,30.0,0.0,40.0,40.0,40.0,40.0,48.0],"fw_hvac_coc":[40.0,40.0,28.6,40.0,44.3,0.0,40.0,40.0,40.0,30.0,0.0,40.0,40.0,40.0,40.0,40.0],"fw_hvac_sal":[0.0,46.0,30.0,17.2,0.0,0.0,0.0,20.0,17.2,0.0,0.0,0.0,0.0,0.0,0.0,8.0]},"ajustos_fw":[{"fw":1,"cocina":0,"sala":0,"dies_coc":"","dies_sal":""},{"fw":2,"cocina":0,"sala":0,"dies_coc":"","dies_sal":""},{"fw":3,"cocina":0,"sala":0,"dies_coc":"","dies_sal":""},{"fw":4,"cocina":0,"sala":0,"dies_coc":"","dies_sal":""},{"fw":5,"cocina":0,"sala":0,"dies_coc":"","dies_sal":""},{"fw":6,"cocina":0,"sala":0,"dies_coc":"","dies_sal":""},{"fw":7,"cocina":0,"sala":0,"dies_coc":"","dies_sal":""},{"fw":8,"cocina":0,"sala":0,"dies_coc":"","dies_sal":""},{"fw":9,"cocina":0,"sala":0,"dies_coc":"","dies_sal":""},{"fw":10,"cocina":0,"sala":0,"dies_coc":"","dies_sal":""},{"fw":11,"cocina":0,"sala":0,"dies_coc":"","dies_sal":""},{"fw":12,"cocina":0,"sala":0,"dies_coc":"","dies_sal":""},{"fw":13,"cocina":0,"sala":0,"dies_coc":"","dies_sal":""},{"fw":14,"cocina":30.0,"sala":0,"dies_coc":"dc-dv","dies_sal":""},{"fw":15,"cocina":30.0,"sala":0,"dies_coc":"dc-dv","dies_sal":""},{"fw":16,"cocina":30.0,"sala":0,"dies_coc":"dc-dv","dies_sal":""}]},"SM Sabadell":{"tot_hcoc":2853,"tot_hsal":3239,"tot_h":6092,"tot_hvac":26,"fw_hvac":[0.0,0.0,30.0,30.0,0.0,0.0,12.9,0.0,0.0,0.0,0.0,0.0,0.0,57.1,40.0,40.0],"fw_hvac_coc":[0.0,0.0,30.0,30.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,28.6,40.0,40.0],"fw_hvac_sal":[0.0,0.0,0.0,0.0,0.0,0.0,12.9,0.0,0.0,0.0,0.0,0.0,0.0,28.6,0.0,0.0],"tot_cost":115750,"fw_list":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16],"fw_hcoc":[153,170,130,127,160,156,230,222,189,212,201,199,175,183,174,173],"fw_hsal":[201,182,201,161,179,214,170,195,196,202,198,204,220,218,251,247],"fw_htot":[354,352,331,288,339,369,400,418,385,413,398,403,395,402,425,420],"fw_cost_p":[6722,6695,6281,5473,6443,7016,7605,7932,7318,7851,7566,7663,7500,7632,8081,7971],"torn_coc":{"Matí":0,"Migdia":1480,"Tarda":0,"Nit":1373},"torn_sal":{"Matí":0,"Migdia":1437,"Tarda":0,"Nit":1802},"avg_dia_hcoc":[20,21,20,21,34,34,28],"avg_dia_hsal":[20,20,21,21,43,48,31],"absencies":{"fw_vacances":[0.0,0.0,30.0,30.0,0.0,0.0,12.9,0.0,0.0,0.0,0.0,0.0,0.0,57.1,40.0,40.0],"fw_baixa":[0.0,0.0,0.0,11.5,0.0,0.0,56.0,108.0,112.0,56.0,112.0,120.5,116.0,112.0,104.0,112.0],"fw_accident":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"fw_injust":[0.0,0.0,0.0,0.0,0.0,0.0,9.5,8.0,16.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"fw_altres":[0.0,15.5,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,4.5],"tot_vacances":210.0,"tot_baixa":1020.0,"tot_accident":0.0,"tot_injust":33.5,"tot_altres":20.0,"cost_baixa":6120,"cost_accident":0,"cost_total":6120,"fw_hvac_total":[0.0,0.0,30.0,30.0,0.0,0.0,12.9,0.0,0.0,0.0,0.0,0.0,0.0,57.1,40.0,40.0],"fw_hvac_coc":[0.0,0.0,30.0,30.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,28.6,40.0,40.0],"fw_hvac_sal":[0.0,0.0,0.0,0.0,0.0,0.0,12.9,0.0,0.0,0.0,0.0,0.0,0.0,28.6,0.0,0.0]},"ajustos_fw":[{"fw":1,"cocina":0,"sala":0,"dies_coc":"","dies_sal":""},{"fw":2,"cocina":0,"sala":0,"dies_coc":"","dies_sal":""},{"fw":3,"cocina":0,"sala":0,"dies_coc":"","dies_sal":""},{"fw":4,"cocina":0,"sala":0,"dies_coc":"","dies_sal":""},{"fw":5,"cocina":0,"sala":0,"dies_coc":"","dies_sal":""},{"fw":6,"cocina":0,"sala":0,"dies_coc":"","dies_sal":""},{"fw":7,"cocina":0,"sala":0,"dies_coc":"","dies_sal":""},{"fw":8,"cocina":0,"sala":0,"dies_coc":"","dies_sal":""},{"fw":9,"cocina":0,"sala":0,"dies_coc":"","dies_sal":""},{"fw":10,"cocina":0,"sala":0,"dies_coc":"","dies_sal":""},{"fw":11,"cocina":0,"sala":0,"dies_coc":"","dies_sal":""},{"fw":12,"cocina":0,"sala":20.0,"dies_coc":"","dies_sal":"dc-ds"},{"fw":13,"cocina":0,"sala":20.0,"dies_coc":"","dies_sal":"dc-ds"},{"fw":14,"cocina":0,"sala":20.0,"dies_coc":"","dies_sal":"dc-ds"},{"fw":15,"cocina":0,"sala":20.0,"dies_coc":"","dies_sal":"dc-ds"},{"fw":16,"cocina":0,"sala":20.0,"dies_coc":"","dies_sal":"dc-ds"}]},"Picu Sabadell":{"tot_hcoc":2602,"tot_hsal":3050,"tot_h":5651,"tot_hvac":35,"fw_hvac":[0.0,0.0,0.0,154.2,0.0,0.0,0.0,0.0,0.0,0.0,0.0,79.9,17.1,0.0,30.0,0.0],"fw_hvac_coc":[0.0,0.0,0.0,97.1,0.0,0.0,0.0,0.0,0.0,0.0,0.0,40.0,0.0,0.0,0.0,0.0],"fw_hvac_sal":[0.0,0.0,0.0,57.1,0.0,0.0,0.0,0.0,0.0,0.0,0.0,40.0,17.1,0.0,30.0,0.0],"tot_cost":107371,"fw_list":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16],"fw_hcoc":[188,170,161,81,171,157,194,187,185,172,156,120,161,168,166,165],"fw_hsal":[227,195,182,99,194,193,193,197,204,194,191,178,191,218,186,207],"fw_htot":[415,365,343,179,365,350,387,384,390,366,347,298,352,386,352,372],"fw_cost_p":[7892,6936,6509,3408,6937,6647,7351,7294,7401,6950,6596,5665,6684,7334,6688,7078],"torn_coc":{"Matí":0,"Migdia":1732,"Tarda":0,"Nit":870},"torn_sal":{"Matí":0,"Migdia":1742,"Tarda":0,"Nit":1308},"avg_dia_hcoc":[23,24,21,22,29,29,21],"avg_dia_hsal":[26,23,22,24,40,41,22],"absencies":{"fw_vacances":[0.0,0.0,0.0,154.2,0.0,0.0,0.0,0.0,0.0,0.0,0.0,79.9,17.1,0.0,30.0,0.0],"fw_baixa":[40.0,40.0,40.0,40.0,78.8,40.0,8.0,0.0,0.0,9.5,0.0,0.0,0.0,0.0,0.0,0.0],"fw_accident":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"fw_injust":[26.0,0.0,0.0,0.0,0.0,9.8,4.8,0.0,0.0,0.0,0.0,0.0,0.0,5.2,0.0,0.0],"fw_altres":[4.0,3.5,4.0,0.0,7.5,6.5,3.5,0.0,0.0,20.5,12.5,0.0,0.0,7.8,0.0,0.0],"tot_vacances":281.2,"tot_baixa":296.3,"tot_accident":0.0,"tot_injust":45.8,"tot_altres":69.8,"cost_baixa":1778,"cost_accident":0,"cost_total":1778,"fw_hvac_total":[0.0,0.0,0.0,154.2,0.0,0.0,0.0,0.0,0.0,0.0,0.0,79.9,17.1,0.0,30.0,0.0],"fw_hvac_coc":[0.0,0.0,0.0,97.1,0.0,0.0,0.0,0.0,0.0,0.0,0.0,40.0,0.0,0.0,0.0,0.0],"fw_hvac_sal":[0.0,0.0,0.0,57.1,0.0,0.0,0.0,0.0,0.0,0.0,0.0,40.0,17.1,0.0,30.0,0.0]},"ajustos_fw":[{"fw":1,"cocina":0,"sala":0,"dies_coc":"","dies_sal":""},{"fw":2,"cocina":0,"sala":0,"dies_coc":"","dies_sal":""},{"fw":3,"cocina":0,"sala":0,"dies_coc":"","dies_sal":""},{"fw":4,"cocina":0,"sala":0,"dies_coc":"","dies_sal":""},{"fw":5,"cocina":0,"sala":0,"dies_coc":"","dies_sal":""},{"fw":6,"cocina":0,"sala":0,"dies_coc":"","dies_sal":""},{"fw":7,"cocina":0,"sala":0,"dies_coc":"","dies_sal":""},{"fw":8,"cocina":0,"sala":0,"dies_coc":"","dies_sal":""},{"fw":9,"cocina":0,"sala":0,"dies_coc":"","dies_sal":""},{"fw":10,"cocina":0,"sala":0,"dies_coc":"","dies_sal":""},{"fw":11,"cocina":0,"sala":0,"dies_coc":"","dies_sal":""},{"fw":12,"cocina":0,"sala":0,"dies_coc":"","dies_sal":""},{"fw":13,"cocina":0,"sala":0,"dies_coc":"","dies_sal":""},{"fw":14,"cocina":0,"sala":0,"dies_coc":"","dies_sal":""},{"fw":15,"cocina":0,"sala":0,"dies_coc":"","dies_sal":""},{"fw":16,"cocina":0,"sala":0,"dies_coc":"","dies_sal":""}]},"Picu StCugat":{"tot_hcoc":1513,"tot_hsal":2493,"tot_h":4006,"tot_hvac":15,"fw_hvac":[30.0,30.0,25.7,12.9,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,11.4,0.0,12.9],"fw_hvac_coc":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"fw_hvac_sal":[30.0,30.0,25.7,12.9,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,11.4,0.0,12.9],"tot_cost":76111,"fw_list":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16],"fw_hcoc":[51,96,74,65,83,73,84,113,86,112,100,103,121,115,118,119],"fw_hsal":[90,172,121,114,153,146,166,162,176,206,225,148,159,161,145,148],"fw_htot":[141,268,195,180,235,219,250,275,262,318,325,252,280,276,263,267],"fw_cost_p":[2682,5089,3706,3411,4474,4163,4747,5219,4981,6051,6170,4784,5322,5248,4991,5073],"torn_coc":{"Matí":0,"Migdia":911,"Tarda":0,"Nit":602},"torn_sal":{"Matí":0,"Migdia":1332,"Tarda":0,"Nit":1161},"avg_dia_hcoc":[10,10,18,20,22,22,13],"avg_dia_hsal":[27,18,24,26,37,47,24],"absencies":{"fw_vacances":[30.0,30.0,25.7,12.9,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,11.4,0.0,12.9],"fw_baixa":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"fw_accident":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"fw_injust":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,6.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"fw_altres":[0.0,0.0,0.0,0.0,4.0,0.0,0.0,0.0,0.0,0.0,12.5,4.0,0.0,0.0,0.0,0.0],"tot_vacances":122.9,"tot_baixa":0.0,"tot_accident":0.0,"tot_injust":6.0,"tot_altres":20.5,"cost_baixa":0,"cost_accident":0,"cost_total":0,"fw_hvac_total":[30.0,30.0,25.7,12.9,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,11.4,0.0,12.9],"fw_hvac_coc":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"fw_hvac_sal":[30.0,30.0,25.7,12.9,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,11.4,0.0,12.9]},"ajustos_fw":[{"fw":1,"cocina":0,"sala":0,"dies_coc":"","dies_sal":""},{"fw":2,"cocina":0,"sala":0,"dies_coc":"","dies_sal":""},{"fw":3,"cocina":0,"sala":0,"dies_coc":"","dies_sal":""},{"fw":4,"cocina":0,"sala":0,"dies_coc":"","dies_sal":""},{"fw":5,"cocina":0,"sala":0,"dies_coc":"","dies_sal":""},{"fw":6,"cocina":0,"sala":0,"dies_coc":"","dies_sal":""},{"fw":7,"cocina":0,"sala":0,"dies_coc":"","dies_sal":""},{"fw":8,"cocina":0,"sala":0,"dies_coc":"","dies_sal":""},{"fw":9,"cocina":0,"sala":0,"dies_coc":"","dies_sal":""},{"fw":10,"cocina":0,"sala":0,"dies_coc":"","dies_sal":""},{"fw":11,"cocina":0,"sala":0,"dies_coc":"","dies_sal":""},{"fw":12,"cocina":0,"sala":-20.0,"dies_coc":"","dies_sal":"dc-dg"},{"fw":13,"cocina":0,"sala":-20.0,"dies_coc":"","dies_sal":"dc-dg"},{"fw":14,"cocina":0,"sala":-20.0,"dies_coc":"","dies_sal":"dc-dg"},{"fw":15,"cocina":0,"sala":-20.0,"dies_coc":"","dies_sal":"dc-dg"},{"fw":16,"cocina":0,"sala":-20.0,"dies_coc":"","dies_sal":"dc-dg"}]}};
+const LD={"weeks":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16],"locals":{"SM Sarrià":{"fam":{"order":["TAPES","BEGUDES","COQUES","BURGERS","VINS I CAVES","CAFES & INFUSIONS","POSTRES","AMANIDES I VERDURETES","MENU","APERITIUS","LICORS","ENTREPANS","SUCS COMBINATS","PASTISSERIA","ALTRES"],"eur":{"TAPES":[5381.1,6572.1,6614.3,5246.4,7846.7,6432.8,7152.1,7524.6,7887.4,6751.6,8466.0,7996.6,8640.9,7945.4,7662.0,9306.4],"BEGUDES":[2663.0,3341.7,3104.4,3087.7,3599.3,3581.2,3798.7,4300.2,4033.5,3506.4,4236.2,4533.5,4956.6,4213.7,5350.2,5407.7],"COQUES":[1454.8,2024.3,2332.1,1843.9,2057.5,1898.1,1988.4,2258.8,2348.1,2080.3,2267.4,2485.3,3061.6,2236.5,2293.3,3103.7],"BURGERS":[1904.7,2234.7,1837.8,1956.2,2581.4,2007.7,2209.2,1944.1,2146.2,1909.1,1947.4,2384.6,2083.2,2874.4,2533.0,2834.4],"VINS I CAVES":[1159.6,1246.9,1392.4,1066.0,1341.6,1031.0,1443.4,1331.1,1520.8,1262.4,1413.3,1740.5,1657.5,1448.7,1443.4,1614.1],"CAFES & INFUSIONS":[1003.3,1239.6,1149.8,1016.8,1073.5,876.2,789.3,939.2,984.1,885.2,916.1,1078.9,903.5,892.0,971.2,965.7],"POSTRES":[788.0,1076.7,756.5,880.1,1164.8,817.1,1041.0,926.1,966.6,1015.4,1238.6,1152.6,1158.2,671.0,712.7,972.5],"AMANIDES I VERDURETES":[680.5,686.5,820.1,542.9,941.7,739.6,967.2,908.6,1024.0,1051.4,979.5,817.1,939.8,861.6,910.2,1221.0],"MENU":[444.6,562.1,492.4,398.5,1093.9,1610.8,573.7,859.3,567.7,766.4,747.9,562.0,832.5,783.7,2325.1,390.1],"APERITIUS":[553.9,521.5,625.4,583.5,689.1,616.0,758.5,630.9,740.1,559.9,629.0,859.4,843.7,736.6,830.6,858.7],"LICORS":[203.0,298.2,130.8,198.7,195.6,263.9,359.4,284.3,356.3,290.6,342.3,336.4,199.5,386.6,354.2,632.2],"ENTREPANS":[311.6,589.1,450.6,391.4,271.7,245.8,272.5,223.3,162.8,163.3,145.3,229.3,149.2,191.0,228.0,213.8],"SUCS COMBINATS":[112.2,175.9,91.0,99.7,100.8,58.2,61.8,57.1,54.2,65.8,99.9,36.8,25.2,42.6,37.7,42.6],"PASTISSERIA":[55.7,79.5,69.1,76.6,63.3,35.3,73.5,46.7,39.2,13.9,25.1,47.4,26.3,36.4,37.1,44.3],"ALTRES":[0.0,0.0,2.5,1.0,1.0,1.0,0.0,1.0,1.0,2.0,1.0,0.5,0.0,3.0,0.5,0.0]},"uni":{"TAPES":[565,699,724,568,828,706,741,830,859,729,876,865,920,850,844,991],"BEGUDES":[812,1046,952,918,1101,1081,1145,1284,1199,1054,1293,1376,1471,1264,1577,1625],"COQUES":[126,176,194,155,175,167,169,199,205,177,189,228,265,199,195,264],"BURGERS":[139,153,124,133,181,142,148,143,142,135,137,162,146,193,172,187],"VINS I CAVES":[190,196,223,182,197,178,212,230,223,196,211,248,253,213,235,257],"CAFES & INFUSIONS":[504,625,572,516,553,462,397,487,500,459,471,564,458,455,519,517],"POSTRES":[124,171,121,137,182,128,163,144,157,158,196,179,178,104,108,160],"AMANIDES I VERDURETES":[66,62,75,50,84,71,90,88,95,93,89,75,88,80,84,108],"MENU":[47,55,51,37,62,83,60,50,54,69,59,53,80,68,127,36],"APERITIUS":[142,134,143,141,180,172,194,172,199,152,166,219,224,198,210,222],"LICORS":[48,64,24,45,44,55,73,63,70,60,67,70,40,78,65,106],"ENTREPANS":[79,139,106,97,62,59,64,52,40,42,34,55,39,45,52,53],"SUCS COMBINATS":[33,41,27,30,27,16,17,15,17,17,29,9,8,11,10,13],"PASTISSERIA":[24,38,34,37,31,15,29,18,18,7,12,22,13,18,17,19],"ALTRES":[54,52,27,41,52,35,44,48,38,46,34,36,25,35,47,50]},"mitja_eur":{"TAPES":7339.1,"BEGUDES":3982.1,"COQUES":2233.4,"BURGERS":2211.8,"VINS I CAVES":1382.0,"CAFES & INFUSIONS":980.3,"POSTRES":958.6,"AMANIDES I VERDURETES":880.7,"MENU":813.2,"APERITIUS":689.8,"LICORS":302.0,"ENTREPANS":264.9,"SUCS COMBINATS":72.6,"PASTISSERIA":48.1,"ALTRES":0.9},"mitja_uni":{"TAPES":787.2,"BEGUDES":1199.9,"COQUES":192.7,"BURGERS":152.3,"VINS I CAVES":215.2,"CAFES & INFUSIONS":503.7,"POSTRES":150.6,"AMANIDES I VERDURETES":81.1,"MENU":61.9,"APERITIUS":179.2,"LICORS":60.8,"ENTREPANS":63.6,"SUCS COMBINATS":20.0,"PASTISSERIA":22.0,"ALTRES":41.5}},"art":{"MENJAR":{"order":["PATATAS BRAVAS","B. LA DOBLE SMASH","B. AMERICANA","TIRES DE POLLO","GUACAMOLE NACHOS","STEAK TARTAR","OUS CAMPEROLS ESTRELLATS","FLOR DE CARXOFA","CROQUETES PERNIL IBERIC","BIKINI TRUFAT","COCA IBERIC BRIE","B. SANTAMASA","COCA BOTIFARRA I BOLETS","MACARRONS DEL CARDENAL","QUESAD. POLLO","B. IBERICA","SECRET IBERIC","COCA ALBERGINIA I SOBRASSADA","SALMO PLANXA","TACOS TARTAR SALMO (2U.)","COCA SALMÓ MARINAT I ALVOCAT","AMANIDA BURRATA","B. CRISPY CHICKEN","CROQUETES DE ROSTIT","ENSALADILLA","TACOS COSTELLA BBQ (2 U.) ","AMANIDA CESAR","HUMUS ","AMANIDA CABRA","ROAST BEEF","POLLASTRE DESOSSAT","COCA FORMATGE DE CABRA","COCA. TARTUFATA","MANDONGUILLES CASOLANES","COCA VERDURETES","COCA POLLASTRES ROSTIT ","MINICANELONS","XAMPINYONS","AMANIDA QUINOA I ALVOCAT","MENU GRUP 38"],"eur":{"PATATAS BRAVAS":[607.2,662.4,607.2,565.8,848.7,786.6,731.4,959.1,855.6,676.2,807.3,1007.4,986.7,1035.0,945.3,979.8],"B. LA DOBLE SMASH":[330.0,627.0,594.0,346.5,643.5,379.5,396.0,577.5,495.0,396.0,412.5,693.0,498.6,1006.5,924.0,874.5],"B. AMERICANA":[524.7,623.7,464.7,549.6,508.8,814.5,763.2,524.7,528.3,542.4,365.7,671.4,492.9,524.7,461.1,750.9],"TIRES DE POLLO":[554.7,593.4,438.6,412.8,425.7,399.9,490.2,593.4,696.6,438.6,657.9,593.4,619.2,709.5,657.9,696.6],"GUACAMOLE NACHOS":[264.5,414.0,460.0,437.0,494.5,356.5,414.0,494.5,494.5,425.5,632.5,598.0,621.0,494.5,632.5,759.0],"STEAK TARTAR":[371.8,473.2,659.1,388.7,388.7,422.5,473.2,473.2,540.8,490.1,507.0,456.3,456.3,456.3,523.9,692.9],"OUS CAMPEROLS ESTRELLATS":[312.9,432.1,387.4,327.8,625.8,447.0,551.3,566.2,536.4,536.4,685.4,521.5,461.9,476.8,312.9,521.5],"FLOR DE CARXOFA":[351.9,317.4,372.6,220.8,393.3,407.1,414.0,414.0,531.3,489.9,503.7,469.2,600.3,414.0,462.3,483.0],"CROQUETES PERNIL IBERIC":[309.6,318.2,369.8,361.2,481.6,335.4,438.6,464.4,335.4,292.4,455.8,421.4,516.0,447.2,430.0,430.0],"BIKINI TRUFAT":[294.0,325.5,357.0,220.5,409.5,336.0,462.0,336.0,577.5,315.0,336.0,588.0,546.0,273.0,430.5,567.0],"COCA IBERIC BRIE":[264.1,403.1,444.8,347.5,361.4,403.1,375.3,264.1,514.3,291.9,375.3,472.6,444.8,222.4,556.0,528.2],"B. SANTAMASA":[312.9,298.0,283.1,432.1,566.2,342.7,432.1,327.8,327.8,327.8,402.3,253.3,402.3,566.2,521.5,359.4],"COCA BOTIFARRA I BOLETS":[275.0,450.0,412.5,350.0,237.5,387.5,387.5,400.0,300.0,350.0,350.0,387.5,500.0,275.0,425.0,550.0],"MACARRONS DEL CARDENAL":[283.5,270.0,310.5,310.5,391.5,297.0,391.5,337.5,310.5,526.5,580.5,351.0,567.0,472.5,391.5,229.5],"QUESAD. POLLO":[213.6,400.5,284.8,258.1,356.0,373.8,311.5,391.6,356.0,391.6,462.8,364.9,507.3,445.0,302.6,542.9],"B. IBERICA":[379.5,313.5,198.0,330.0,430.8,247.5,379.5,231.0,363.0,330.0,379.5,379.5,330.0,330.0,313.5,447.3],"SECRET IBERIC":[351.5,277.5,351.5,185.0,333.0,296.0,370.0,203.5,296.0,277.5,407.0,462.5,388.5,425.5,185.0,555.0],"COCA ALBERGINIA I SOBRASSADA":[214.2,249.9,333.2,309.4,452.2,309.4,261.8,392.7,357.0,333.2,261.8,392.7,511.7,333.2,261.8,321.3],"SALMO PLANXA":[148.0,370.0,185.0,203.5,518.0,314.5,370.0,277.5,425.5,351.5,499.5,148.0,425.5,314.5,351.5,296.0],"TACOS TARTAR SALMO (2U.)":[178.5,285.6,368.9,119.0,321.3,285.6,309.4,404.6,392.7,273.7,261.8,416.5,309.4,345.1,368.9,487.9],"COCA SALMÓ MARINAT I ALVOCAT":[104.3,74.5,312.9,178.8,238.4,163.9,283.1,342.7,372.5,268.2,432.1,268.2,432.1,312.9,417.2,461.9],"AMANIDA BURRATA":[166.8,166.8,291.9,194.6,361.4,180.7,278.0,264.1,347.5,319.7,333.6,278.0,236.3,250.2,278.0,514.3],"B. CRISPY CHICKEN":[268.2,298.0,223.5,223.5,312.9,149.0,208.6,253.3,357.6,283.1,312.9,298.0,283.1,342.7,163.9,327.8],"CROQUETES DE ROSTIT":[172.0,223.6,309.6,129.0,232.2,258.0,258.0,309.6,180.6,232.2,378.4,275.2,266.6,223.6,301.0,283.8],"ENSALADILLA":[147.6,254.2,205.0,164.0,254.2,278.8,155.8,303.4,262.4,139.4,229.6,319.8,254.2,278.8,303.4,336.2],"TACOS COSTELLA BBQ (2 U.) ":[180.5,275.5,228.0,228.0,285.0,123.5,152.0,123.5,237.5,361.0,247.0,266.0,275.5,342.0,237.5,285.0],"AMANIDA CESAR":[202.3,238.0,154.7,107.1,202.3,214.2,309.4,273.7,249.9,321.3,249.9,214.2,249.9,285.6,238.0,226.1],"HUMUS ":[144.5,153.0,195.5,246.5,280.5,170.0,195.5,229.5,297.5,195.5,331.5,195.5,374.0,170.0,246.5,280.5],"AMANIDA CABRA":[172.8,172.8,205.2,162.0,259.2,216.0,280.8,172.8,248.4,291.6,237.6,216.0,216.0,226.8,216.0,302.4],"ROAST BEEF":[101.4,169.0,287.3,135.2,304.2,304.2,253.5,152.1,118.3,169.0,371.8,219.7,202.8,253.5,202.8,219.7],"POLLASTRE DESOSSAT":[94.5,175.5,135.0,216.0,337.5,121.5,243.0,216.0,175.5,270.0,216.0,175.5,351.0,229.5,202.5,270.0],"COCA FORMATGE DE CABRA":[114.0,239.4,182.4,102.6,205.2,228.0,182.4,228.0,262.2,182.4,228.0,182.4,399.0,216.6,125.4,285.0],"COCA. TARTUFATA":[108.0,270.0,183.6,194.4,226.8,183.6,172.8,151.2,172.8,205.2,259.2,280.8,194.4,259.2,151.2,280.8],"MANDONGUILLES CASOLANES":[247.8,212.4,129.8,141.6,188.8,236.0,247.8,236.0,247.8,224.2,224.2,153.4,188.8,236.0,165.2,188.8],"COCA VERDURETES":[220.5,147.0,189.0,147.0,157.5,115.5,147.0,252.0,220.5,199.5,178.5,273.0,220.5,220.5,136.5,430.5],"COCA POLLASTRES ROSTIT ":[154.7,190.4,273.7,214.2,178.5,107.1,178.5,214.2,107.1,249.9,154.7,214.2,261.8,368.9,178.5,190.4],"MINICANELONS":[153.6,204.8,166.4,76.8,166.4,268.8,153.6,140.8,243.2,230.4,166.4,192.0,256.0,307.2,294.4,153.6],"XAMPINYONS":[211.2,105.6,149.6,167.2,202.4,132.0,220.0,255.2,237.6,105.6,149.6,237.6,211.2,202.4,272.8,290.4],"AMANIDA QUINOA I ALVOCAT":[138.6,108.9,168.3,79.2,118.8,128.7,99.0,198.0,178.2,118.8,158.4,108.9,237.6,99.0,178.2,178.2],"MENU GRUP 38":[0.0,0.0,0.0,0.0,532.0,1026.0,0.0,380.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]},"uni":{"PATATAS BRAVAS":[90,105,97,86,126,121,110,147,130,101,123,149,148,158,148,148],"B. LA DOBLE SMASH":[23,41,40,22,41,30,25,39,32,28,27,46,35,67,60,56],"B. AMERICANA":[37,42,30,36,36,53,49,37,36,41,29,45,32,37,35,49],"TIRES DE POLLO":[45,52,44,33,37,38,41,53,66,38,58,52,52,61,56,63],"GUACAMOLE NACHOS":[25,42,45,40,47,40,40,47,52,41,63,60,61,45,64,71],"STEAK TARTAR":[22,29,39,23,24,26,30,30,33,31,30,28,28,27,33,41],"OUS CAMPEROLS ESTRELLATS":[22,29,26,22,44,30,39,39,36,36,46,36,33,32,23,35],"FLOR DE CARXOFA":[51,47,55,33,57,61,63,61,77,74,74,68,87,60,67,71],"CROQUETES PERNIL IBERIC":[36,42,48,44,58,47,53,57,46,35,57,52,63,57,54,56],"BIKINI TRUFAT":[31,37,38,24,42,33,52,40,60,37,35,62,56,26,44,59],"COCA IBERIC BRIE":[20,31,33,27,31,31,30,23,40,23,29,37,37,17,43,40],"B. SANTAMASA":[22,21,19,29,40,23,31,25,22,22,28,18,32,38,36,24],"COCA BOTIFARRA I BOLETS":[23,37,35,29,20,34,33,37,28,30,30,40,45,27,36,45],"MACARRONS DEL CARDENAL":[22,23,29,26,30,22,29,27,24,44,45,30,46,39,29,19],"QUESAD. POLLO":[25,52,43,33,47,47,36,50,54,52,60,46,64,58,40,66],"B. IBERICA":[26,21,14,24,30,18,24,17,23,22,25,27,22,21,19,29],"SECRET IBERIC":[19,16,22,12,18,17,22,12,16,16,22,25,23,23,12,32],"COCA ALBERGINIA I SOBRASSADA":[18,22,28,26,38,28,23,36,32,29,22,35,45,30,26,29],"SALMO PLANXA":[9,20,10,11,29,17,20,15,23,19,27,9,24,17,20,16],"TACOS TARTAR SALMO (2U.)":[15,24,32,10,28,24,27,34,33,24,22,36,27,29,31,43],"COCA SALMÓ MARINAT I ALVOCAT":[7,6,22,12,17,12,19,24,26,19,30,21,29,23,29,36],"AMANIDA BURRATA":[13,13,22,15,27,14,23,23,26,23,27,24,18,20,21,39],"B. CRISPY CHICKEN":[22,23,16,17,26,13,17,23,24,20,23,20,20,23,12,24],"CROQUETES DE ROSTIT":[20,28,40,15,30,36,31,36,28,31,46,33,33,29,36,37],"ENSALADILLA":[19,36,32,22,33,42,20,39,33,23,31,41,34,36,41,45],"TACOS COSTELLA BBQ (2 U.) ":[19,29,25,24,30,13,16,14,25,38,26,28,32,36,27,30],"AMANIDA CESAR":[21,20,17,10,20,21,31,27,25,29,22,18,26,28,22,21],"HUMUS ":[20,21,27,34,35,27,26,34,38,29,42,30,45,23,29,36],"AMANIDA CABRA":[18,18,19,17,25,22,26,17,24,27,24,22,20,22,23,29],"ROAST BEEF":[7,10,17,8,21,20,17,11,8,10,23,14,12,15,13,14],"POLLASTRE DESOSSAT":[9,13,11,17,26,11,20,18,19,25,19,15,27,20,18,25],"COCA FORMATGE DE CABRA":[11,23,16,10,18,23,17,21,27,16,21,17,37,21,12,26],"COCA. TARTUFATA":[11,25,17,18,21,17,16,14,16,19,24,27,18,24,14,26],"MANDONGUILLES CASOLANES":[23,20,18,16,17,21,25,22,22,20,20,13,16,20,16,17],"COCA VERDURETES":[21,15,18,14,15,12,16,25,21,20,18,29,22,21,16,41],"COCA POLLASTRES ROSTIT ":[15,17,25,19,15,10,15,18,11,21,13,20,24,34,15,17],"MINICANELONS":[13,16,14,6,13,21,12,11,19,18,13,15,20,24,23,12],"XAMPINYONS":[25,13,17,19,23,15,25,29,27,12,17,27,24,24,31,35],"AMANIDA QUINOA I ALVOCAT":[14,11,17,8,12,14,10,21,20,14,16,11,24,10,18,19],"MENU GRUP 38":[0,0,0,0,14,27,0,10,0,0,0,0,0,0,0,0]},"mitja_eur":{"PATATAS BRAVAS":816.4,"B. LA DOBLE SMASH":574.6,"B. AMERICANA":569.5,"TIRES DE POLLO":561.1,"GUACAMOLE NACHOS":499.5,"STEAK TARTAR":485.9,"OUS CAMPEROLS ESTRELLATS":481.5,"FLOR DE CARXOFA":427.8,"CROQUETES PERNIL IBERIC":400.4,"BIKINI TRUFAT":398.3,"COCA IBERIC BRIE":391.8,"B. SANTAMASA":384.7,"COCA BOTIFARRA I BOLETS":377.3,"MACARRONS DEL CARDENAL":376.3,"QUESAD. POLLO":372.7,"B. IBERICA":336.4,"SECRET IBERIC":335.3,"COCA ALBERGINIA I SOBRASSADA":331.0,"SALMO PLANXA":324.9,"TACOS TARTAR SALMO (2U.)":320.6,"COCA SALMÓ MARINAT I ALVOCAT":291.5,"AMANIDA BURRATA":278.9,"B. CRISPY CHICKEN":269.1,"CROQUETES DE ROSTIT":252.1,"ENSALADILLA":242.9,"TACOS COSTELLA BBQ (2 U.) ":240.5,"AMANIDA CESAR":233.5,"HUMUS ":231.6,"AMANIDA CABRA":224.8,"ROAST BEEF":216.5,"POLLASTRE DESOSSAT":214.3,"COCA FORMATGE DE CABRA":210.2,"COCA. TARTUFATA":205.9,"MANDONGUILLES CASOLANES":204.3,"COCA VERDURETES":203.4,"COCA POLLASTRES ROSTIT ":202.3,"MINICANELONS":198.4,"XAMPINYONS":196.9,"AMANIDA QUINOA I ALVOCAT":143.6,"MENU GRUP 38":121.1},"mitja_uni":{"PATATAS BRAVAS":124.2,"B. LA DOBLE SMASH":38.2,"B. AMERICANA":39.0,"TIRES DE POLLO":49.3,"GUACAMOLE NACHOS":48.9,"STEAK TARTAR":29.6,"OUS CAMPEROLS ESTRELLATS":33.0,"FLOR DE CARXOFA":62.9,"CROQUETES PERNIL IBERIC":50.3,"BIKINI TRUFAT":42.2,"COCA IBERIC BRIE":30.8,"B. SANTAMASA":26.9,"COCA BOTIFARRA I BOLETS":33.1,"MACARRONS DEL CARDENAL":30.2,"QUESAD. POLLO":48.3,"B. IBERICA":22.6,"SECRET IBERIC":19.2,"COCA ALBERGINIA I SOBRASSADA":29.2,"SALMO PLANXA":17.9,"TACOS TARTAR SALMO (2U.)":27.4,"COCA SALMÓ MARINAT I ALVOCAT":20.8,"AMANIDA BURRATA":21.8,"B. CRISPY CHICKEN":20.2,"CROQUETES DE ROSTIT":31.8,"ENSALADILLA":32.9,"TACOS COSTELLA BBQ (2 U.) ":25.8,"AMANIDA CESAR":22.4,"HUMUS ":31.0,"AMANIDA CABRA":22.1,"ROAST BEEF":13.8,"POLLASTRE DESOSSAT":18.3,"COCA FORMATGE DE CABRA":19.8,"COCA. TARTUFATA":19.2,"MANDONGUILLES CASOLANES":19.1,"COCA VERDURETES":20.2,"COCA POLLASTRES ROSTIT ":18.1,"MINICANELONS":15.6,"XAMPINYONS":22.7,"AMANIDA QUINOA I ALVOCAT":14.9,"MENU GRUP 38":3.2}},"POSTRES":{"order":["CHEESECAKE","LEMON PIE","BROWNIE DE CHOCOLATA I NOUS. + GELAT VAINILLA","TIRAMISU","CARDINALE","CARPACCIO DE PIÑA","GELAT CACAU HOLANDES","GELAT LLIMONA"],"eur":{"CHEESECAKE":[143.0,195.0,149.5,214.5,234.0,169.0,208.0,188.5,208.0,149.5,214.5,149.5,247.0,130.0,110.5,182.0],"LEMON PIE":[175.2,146.0,109.5,138.7,189.8,124.1,138.7,116.8,182.5,167.9,277.4,175.2,255.5,87.6,189.8,138.7],"BROWNIE DE CHOCOLATA I NOUS. + GELAT VAINILLA":[143.0,169.0,143.0,143.0,162.5,143.0,182.0,188.5,149.5,117.0,149.5,227.5,110.5,91.0,91.0,136.5],"TIRAMISU":[104.0,175.5,117.0,123.5,162.5,123.5,162.5,208.0,117.0,175.5,182.0,214.5,149.5,110.5,71.5,110.5],"CARDINALE":[62.1,117.3,82.8,75.9,124.2,55.2,75.9,75.9,82.8,179.4,117.3,158.7,110.4,96.6,82.8,124.2],"CARPACCIO DE PIÑA":[53.1,106.2,35.4,35.4,118.0,70.8,94.4,94.4,70.8,106.2,123.9,41.3,118.0,41.3,53.1,70.8],"GELAT CACAU HOLANDES":[24.0,66.0,18.0,24.0,60.0,30.0,18.0,18.0,42.0,36.0,42.0,18.0,24.0,24.0,48.0,48.0],"GELAT LLIMONA":[18.0,30.0,30.0,18.0,30.0,18.0,42.0,6.0,54.0,6.0,54.0,36.0,30.0,24.0,48.0,72.0]},"uni":{"CHEESECAKE":[23,30,24,33,37,26,32,29,32,23,34,23,38,20,17,30],"LEMON PIE":[24,20,17,19,27,17,20,17,27,25,39,25,35,12,26,20],"BROWNIE DE CHOCOLATA I NOUS. + GELAT VAINILLA":[22,29,22,23,25,23,29,30,26,19,27,36,17,14,14,22],"TIRAMISU":[17,29,18,19,25,19,25,32,19,27,28,33,23,17,11,19],"CARDINALE":[9,17,12,11,18,8,11,11,13,26,17,23,16,14,12,19],"CARPACCIO DE PIÑA":[9,18,6,6,20,12,16,16,13,18,21,7,20,7,9,12],"GELAT CACAU HOLANDES":[4,11,3,4,10,5,3,3,8,6,7,3,4,4,8,9],"GELAT LLIMONA":[3,5,5,3,5,3,7,1,9,1,10,6,5,4,8,13]},"mitja_eur":{"CHEESECAKE":180.8,"LEMON PIE":163.3,"BROWNIE DE CHOCOLATA I NOUS. + GELAT VAINILLA":146.7,"TIRAMISU":144.2,"CARDINALE":101.3,"CARPACCIO DE PIÑA":77.1,"GELAT CACAU HOLANDES":33.8,"GELAT LLIMONA":32.2},"mitja_uni":{"CHEESECAKE":28.2,"LEMON PIE":23.1,"BROWNIE DE CHOCOLATA I NOUS. + GELAT VAINILLA":23.6,"TIRAMISU":22.6,"CARDINALE":14.8,"CARPACCIO DE PIÑA":13.1,"GELAT CACAU HOLANDES":5.8,"GELAT LLIMONA":5.5}},"BEGUDES":{"order":["BARRIL 33 CL","AGUA 50cl","COCA COLA ZERO","BARRIL. TURIA","CAFE AMB LLET","CLARA 33 CL","VICHY 33 CL","COPA CAMIONETA","TALLAT","COCA COLA 35CL","CAFE SOL","AQUARIOUS LLIMONA","APEROL SPRITZ","COPA SANTES","V. SANTAMASA","Sense alcohol tostada","ZURITO 0,2 CL","NESTEA","COPA VIÑA SALCEDA","COPA CAVA TERRER"],"eur":{"BARRIL 33 CL":[689.5,883.5,815.5,769.0,1046.5,1022.0,1108.5,1185.5,1155.0,1045.5,1308.0,1336.5,1308.0,1172.5,1578.5,1470.0],"AGUA 50cl":[568.4,686.0,574.0,543.2,730.8,596.4,646.8,660.8,666.4,655.2,761.6,828.8,890.4,666.4,730.8,921.2],"COCA COLA ZERO":[203.0,322.0,276.5,269.5,224.0,301.0,304.5,322.0,318.5,206.5,336.0,283.5,381.5,269.5,493.5,462.0],"BARRIL. TURIA":[226.8,216.0,223.2,223.2,234.0,266.4,313.2,442.8,295.2,295.2,262.8,342.0,478.8,288.0,435.6,414.0],"CAFE AMB LLET":[338.6,451.5,385.3,348.2,331.8,269.9,234.8,293.3,318.3,214.4,294.7,291.0,222.0,244.5,331.1,315.8],"CLARA 33 CL":[104.4,165.6,216.0,273.6,255.6,212.4,298.8,295.2,331.2,230.4,313.2,345.6,374.4,280.8,309.6,403.2],"VICHY 33 CL":[198.4,211.2,227.2,265.6,246.4,214.4,246.4,249.6,256.0,259.2,304.0,259.2,240.0,262.4,387.2,374.4],"COPA CAMIONETA":[154.0,193.6,224.4,242.0,193.6,233.2,228.8,303.6,303.6,180.4,277.2,365.2,299.2,277.2,136.4,123.2],"TALLAT":[202.0,265.4,250.0,204.1,255.4,192.2,169.2,238.1,216.4,239.2,228.6,236.8,268.3,235.0,210.7,236.8],"COCA COLA 35CL":[171.5,185.5,122.5,122.5,136.5,143.5,210.0,294.0,168.0,189.0,168.0,245.0,259.0,371.0,262.5,189.0],"CAFE SOL":[137.6,171.8,192.1,147.1,151.5,115.5,140.4,136.3,167.4,188.0,142.0,195.8,174.9,149.4,167.4,153.0],"AQUARIOUS LLIMONA":[49.0,94.5,98.0,73.5,105.0,87.5,91.0,140.0,122.5,56.0,84.0,157.5,112.0,196.0,168.0,185.5],"APEROL SPRITZ":[45.0,37.5,30.0,45.0,30.0,97.5,127.5,75.0,165.0,82.5,60.0,82.5,75.0,135.0,172.5,397.5],"COPA SANTES":[87.4,110.4,105.8,115.0,82.8,133.4,110.4,92.0,101.2,174.8,156.4,170.2,87.4,4.6,0.0,50.6],"V. SANTAMASA":[76.0,110.2,22.8,91.2,83.6,87.4,87.4,136.8,117.8,83.6,117.8,125.4,57.0,121.6,91.2,110.2],"Sense alcohol tostada":[54.0,50.4,64.8,64.8,100.8,108.0,82.8,86.4,97.2,90.0,61.2,133.2,129.6,108.0,111.6,136.8],"ZURITO 0,2 CL":[49.1,44.1,94.1,53.2,90.0,100.7,84.1,87.5,105.7,66.6,114.1,120.7,88.9,132.5,82.5,95.0],"NESTEA":[52.5,66.5,52.5,52.5,87.5,66.5,73.5,77.0,63.0,59.5,66.5,94.5,119.0,84.0,133.0,150.5],"COPA VIÑA SALCEDA":[60.0,30.0,45.0,45.0,130.0,105.0,180.0,160.0,80.0,110.0,15.0,15.0,30.0,35.0,110.0,120.0],"COPA CAVA TERRER":[103.5,112.5,67.5,90.0,117.0,31.5,81.0,67.5,81.0,31.5,54.0,22.5,63.0,76.5,72.0,139.5]},"uni":{"BARRIL 33 CL":[197,260,235,220,300,292,318,339,330,299,374,383,374,335,451,420],"AGUA 50cl":[204,256,205,194,267,218,234,240,238,239,277,296,319,238,263,335],"COCA COLA ZERO":[58,92,80,77,64,86,88,92,91,59,96,81,109,77,141,132],"BARRIL. TURIA":[63,62,62,62,65,74,87,123,82,82,73,95,133,80,121,115],"CAFE AMB LLET":[149,202,172,156,147,119,104,134,143,95,131,130,100,108,146,141],"CLARA 33 CL":[29,46,63,76,72,59,83,82,92,64,87,96,104,78,86,112],"VICHY 33 CL":[62,66,71,83,77,68,77,79,80,81,97,82,76,82,121,119],"COPA CAMIONETA":[35,44,51,55,44,53,52,71,69,41,64,83,68,63,31,28],"TALLAT":[101,130,125,101,125,99,84,120,107,119,115,119,134,116,104,118],"COCA COLA 35CL":[50,55,41,35,39,43,60,85,48,54,49,70,74,107,76,55],"CAFE SOL":[77,96,107,82,90,65,78,76,95,105,81,111,98,83,93,85],"AQUARIOUS LLIMONA":[14,29,28,21,30,25,26,40,35,16,24,45,32,56,48,53],"APEROL SPRITZ":[6,5,4,6,4,13,17,10,22,11,8,11,10,18,23,53],"COPA SANTES":[19,24,23,25,18,29,24,20,22,38,34,37,19,1,0,11],"V. SANTAMASA":[20,29,6,24,22,23,23,36,31,23,31,33,15,32,24,29],"Sense alcohol tostada":[15,14,18,18,28,30,23,24,27,25,17,37,36,30,31,38],"ZURITO 0,2 CL":[20,21,38,22,36,42,34,35,43,27,46,49,37,53,33,38],"NESTEA":[17,19,15,15,25,19,21,22,18,17,19,27,34,24,38,43],"COPA VIÑA SALCEDA":[12,6,9,9,26,21,36,32,16,22,3,3,6,7,22,24],"COPA CAVA TERRER":[23,25,15,20,26,7,18,15,18,7,12,5,14,17,16,31]},"mitja_eur":{"BARRIL 33 CL":1118.4,"AGUA 50cl":695.5,"COCA COLA ZERO":310.8,"BARRIL. TURIA":309.8,"CAFE AMB LLET":305.3,"CLARA 33 CL":275.6,"VICHY 33 CL":262.6,"COPA CAMIONETA":233.5,"TALLAT":228.0,"COCA COLA 35CL":202.3,"CAFE SOL":158.1,"AQUARIOUS LLIMONA":113.8,"APEROL SPRITZ":103.6,"COPA SANTES":98.9,"V. SANTAMASA":95.0,"Sense alcohol tostada":92.5,"ZURITO 0,2 CL":88.1,"NESTEA":81.2,"COPA VIÑA SALCEDA":79.4,"COPA CAVA TERRER":75.7},"mitja_uni":{"BARRIL 33 CL":320.4,"AGUA 50cl":251.4,"COCA COLA ZERO":88.9,"BARRIL. TURIA":86.2,"CAFE AMB LLET":136.1,"CLARA 33 CL":76.8,"VICHY 33 CL":82.6,"COPA CAMIONETA":53.2,"TALLAT":113.6,"COCA COLA 35CL":58.8,"CAFE SOL":88.9,"AQUARIOUS LLIMONA":32.6,"APEROL SPRITZ":13.8,"COPA SANTES":21.5,"V. SANTAMASA":25.1,"Sense alcohol tostada":25.7,"ZURITO 0,2 CL":35.9,"NESTEA":23.3,"COPA VIÑA SALCEDA":15.9,"COPA CAVA TERRER":16.8}}}},"SM Sabadell":{"fam":{"order":["TAPES","COQUES","BEGUDES","BURGERS","POSTRES","PLATILLOS","VINS I CAVES","AMANIDES I VERDURETES","CAFES & INFUSIONS","FLAUTES","APERITIUS","MENU","LICORS","PASTISSERIA","ALTRES"],"eur":{"TAPES":[8187.9,5841.0,4122.4,5068.3,4974.1,4966.9,5212.4,5834.1,5218.1,4723.0,4792.0,5428.5,5700.1,6344.0,5458.2,5230.7],"COQUES":[5497.8,4375.5,2643.0,3618.4,3989.4,3988.4,3737.4,4093.9,4074.6,3246.4,3236.3,4016.1,4049.4,4793.4,3708.8,3741.6],"BEGUDES":[3588.8,2586.3,1647.3,2057.4,2319.7,2276.5,2127.0,2507.5,2529.3,1910.9,1998.9,2205.3,2539.1,2612.7,2348.2,2379.9],"BURGERS":[3331.8,2619.8,1590.8,1735.1,2043.8,1846.9,1856.2,2294.4,2430.7,1858.1,1984.5,1691.6,2324.3,2561.1,1535.1,1919.2],"POSTRES":[2184.4,1491.8,1070.7,1217.0,1630.9,1449.9,1508.4,1615.5,1443.6,1588.4,1614.4,1532.7,1512.6,1655.3,1093.2,1193.0],"PLATILLOS":[2175.3,1685.5,1093.4,1379.4,1369.6,1342.7,1648.6,1345.7,1465.2,1329.8,1470.2,1113.0,1499.6,2067.2,1221.5,955.1],"VINS I CAVES":[1331.7,1503.1,1003.6,1190.4,1164.8,959.8,1241.4,1088.6,1235.2,1047.6,1110.4,1175.7,911.8,1493.6,1132.1,1070.7],"AMANIDES I VERDURETES":[938.5,722.2,524.8,630.0,853.2,722.2,537.7,602.2,652.8,533.7,538.7,499.0,576.4,698.4,612.1,598.2],"CAFES & INFUSIONS":[509.4,381.4,248.3,379.7,383.6,406.3,342.8,299.9,370.5,317.7,285.7,286.2,277.9,379.9,279.5,206.6],"FLAUTES":[357.1,225.1,184.3,183.5,236.1,186.3,213.8,274.3,259.8,171.8,220.4,272.4,301.9,308.0,206.3,360.2],"APERITIUS":[161.2,185.6,130.1,126.2,145.0,167.6,172.0,165.3,183.7,131.8,130.4,189.6,138.3,253.4,195.4,207.0],"MENU":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,12.9,0.0,1010.0,560.0,646.0],"LICORS":[24.0,28.0,20.0,33.0,13.0,18.5,14.0,66.0,35.0,24.0,18.0,42.0,37.0,6.0,55.5,43.0],"PASTISSERIA":[9.0,4.0,0.0,0.0,20.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"ALTRES":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]},"uni":{"TAPES":[971,720,489,601,600,612,618,684,630,562,545,647,659,771,676,650],"COQUES":[433,355,219,294,330,326,292,331,325,267,261,333,328,410,313,314],"BEGUDES":[1097,801,511,647,721,698,659,780,772,597,618,678,789,832,737,765],"BURGERS":[218,180,107,119,133,137,132,163,181,129,138,124,159,189,123,149],"POSTRES":[335,237,166,194,251,227,235,251,217,242,248,237,232,258,169,194],"PLATILLOS":[137,110,68,91,84,86,110,84,90,84,88,70,94,136,81,72],"VINS I CAVES":[162,173,139,156,145,144,150,133,167,138,137,156,139,209,157,163],"AMANIDES I VERDURETES":[75,58,48,52,77,67,45,52,54,44,43,41,50,82,64,64],"CAFES & INFUSIONS":[263,192,126,201,194,208,177,166,219,177,175,168,188,241,184,158],"FLAUTES":[50,38,28,24,36,27,25,34,38,22,28,32,37,41,28,47],"APERITIUS":[38,42,30,28,35,39,39,33,40,30,28,43,33,58,37,52],"MENU":[0,0,0,0,0,0,0,0,0,0,0,1,0,47,26,31],"LICORS":[8,8,6,7,3,5,4,18,8,8,4,14,11,3,14,13],"PASTISSERIA":[9,4,0,0,20,0,0,0,0,0,0,0,0,0,0,0],"ALTRES":[0,0,0,0,0,0,2,0,1,45,27,55,44,6,4,2]},"mitja_eur":{"TAPES":5443.9,"COQUES":3925.6,"BEGUDES":2352.2,"BURGERS":2101.5,"POSTRES":1487.6,"PLATILLOS":1447.6,"VINS I CAVES":1166.3,"AMANIDES I VERDURETES":640.0,"CAFES & INFUSIONS":334.7,"FLAUTES":247.6,"APERITIUS":167.7,"MENU":139.3,"LICORS":29.8,"PASTISSERIA":2.1,"ALTRES":0.0},"mitja_uni":{"TAPES":652.2,"COQUES":320.7,"BEGUDES":731.4,"BURGERS":148.8,"POSTRES":230.8,"PLATILLOS":92.8,"VINS I CAVES":154.2,"AMANIDES I VERDURETES":57.2,"CAFES & INFUSIONS":189.8,"FLAUTES":33.4,"APERITIUS":37.8,"MENU":6.6,"LICORS":8.4,"PASTISSERIA":2.1,"ALTRES":11.6}},"art":{"MENJAR":{"order":[" COCA BUTIFARRA","COCA PERNIL IBÈRIC","PATATES BRAVES","HAMB. AMERICANA","TIRES DE POLLASTRE","GUACAMOLE AMB NACHOS","COCA SOBRASSADA","COCA DE CARBASSÓ","QUESADILLES ","COCA 4 QUESOS","CROQ. DE ROSTIT 3U","HAM. IBERICA","BIKINI TRUFAT","HAMB. CLÀSSICA","\"TACOS\" COSTELLA BBQ,","HAMB. SANTAMASA","PICANHA","HAMB. CRISPY CHICKEN","CROQ. DE PERNIL 3U","TARTAR ATUN","STEAK TARTAR","XAMPINYONS ","DADOS DE SOLOMILLO","ENS. FORMATGE DE CABRA","ENS. BURRATA","MACARRONES","TATAKI SALMON","TARTAR DE TOMAQUET","HUMMUS","ENSALADILLA RUSSA","MINI CANELONES","ENS. CESAR","PA AMB TOMÀQUET","HAMB. VEGAN","PLATET DE PALETILLA IBÈRICA"," FLAUTA \"PEPITO\" DE VEDELLA","FLAUTA LLOM ","MENU 20"," FLAUTA POLLASTRE","\"GILDA\" DE SEITONS"],"eur":{" COCA BUTIFARRA":[1818.9,1290.0,722.4,1199.7,1225.5,1148.1,1135.2,1122.3,1419.0,915.9,1019.1,1122.3,1122.3,1212.6,1135.2,1019.1],"COCA PERNIL IBÈRIC":[1654.1,1264.9,792.3,1042.5,1167.6,1139.8,1139.8,1195.4,1139.8,986.9,834.0,1195.4,1153.7,1445.6,1084.2,1390.0],"PATATES BRAVES":[1360.8,972.0,684.0,892.8,979.2,907.2,957.6,1094.4,1051.2,820.8,864.0,864.0,1029.6,1202.4,979.2,878.4],"HAMB. AMERICANA":[1256.1,763.2,556.5,588.3,731.4,810.9,540.6,779.1,731.4,763.2,699.6,381.6,779.1,938.1,492.9,636.0],"TIRES DE POLLASTRE":[967.5,683.7,490.2,503.1,696.6,490.2,606.3,709.5,477.3,670.8,412.8,709.5,735.3,722.4,606.3,709.5],"GUACAMOLE AMB NACHOS":[995.1,877.4,460.1,599.2,492.2,535.0,631.3,556.4,513.6,567.1,599.2,556.4,642.0,727.6,620.6,577.4],"COCA SOBRASSADA":[900.0,550.0,425.0,512.5,550.0,812.5,662.5,637.5,462.5,537.5,625.0,700.0,675.0,925.0,425.0,475.0],"COCA DE CARBASSÓ":[700.0,775.0,337.5,462.5,562.5,475.0,587.5,737.5,687.5,487.5,475.0,550.0,650.0,750.0,675.0,562.5],"QUESADILLES ":[685.3,462.8,320.4,507.3,418.3,418.3,400.5,640.8,436.1,356.0,445.0,489.5,462.8,587.4,525.1,427.2],"COCA 4 QUESOS":[424.8,495.6,365.8,401.2,483.8,413.0,212.4,401.2,365.8,318.6,283.2,448.4,448.4,460.2,389.4,295.0],"CROQ. DE ROSTIT 3U":[627.8,421.4,292.4,395.6,301.0,344.0,421.4,378.4,318.2,283.8,318.2,344.0,344.0,378.4,352.6,335.4],"HAM. IBERICA":[561.0,247.5,330.0,363.0,247.5,214.5,280.5,379.5,412.5,330.0,412.5,264.0,528.0,346.5,247.5,264.0],"BIKINI TRUFAT":[578.2,460.6,274.4,264.6,264.6,264.6,235.2,431.2,313.6,362.6,245.0,323.4,343.0,362.6,372.4,323.4],"HAMB. CLÀSSICA":[521.5,521.5,268.2,223.5,312.9,268.2,342.7,371.7,327.0,208.6,312.5,357.6,312.9,447.0,238.4,312.9],"\"TACOS\" COSTELLA BBQ,":[627.0,351.5,209.0,332.5,285.0,247.0,285.0,408.5,446.5,237.5,275.5,266.0,351.5,361.0,304.0,228.0],"HAMB. SANTAMASA":[461.9,372.5,193.7,178.8,447.0,238.4,238.4,342.7,461.9,223.5,193.3,387.4,283.1,402.3,268.2,268.2],"PICANHA":[375.9,304.3,232.7,286.4,286.4,268.5,340.1,214.8,358.0,322.2,304.3,214.8,447.5,429.6,143.2,232.7],"HAMB. CRISPY CHICKEN":[387.4,491.7,178.8,238.4,193.7,283.1,342.7,341.9,386.6,253.3,223.5,253.3,357.6,268.2,208.6,342.7],"CROQ. DE PERNIL 3U":[455.8,266.6,258.0,223.6,249.4,335.4,309.6,283.8,240.8,249.4,292.4,352.6,232.2,326.8,232.2,326.8],"TARTAR ATUN":[322.2,358.0,161.1,286.4,304.3,286.4,214.8,322.2,340.1,196.9,340.1,214.8,304.3,379.9,270.5,131.3],"STEAK TARTAR":[354.9,236.6,321.1,253.5,270.4,287.3,202.8,236.6,304.2,253.5,270.4,321.1,270.4,287.3,202.8,287.3],"XAMPINYONS ":[369.6,246.4,114.4,255.2,308.0,308.0,264.0,272.8,290.4,228.8,211.2,299.2,334.4,246.4,228.8,237.6],"DADOS DE SOLOMILLO":[456.3,371.8,253.5,169.0,185.9,219.7,270.4,236.6,287.3,270.4,253.5,219.7,152.1,287.3,270.4,219.7],"ENS. FORMATGE DE CABRA":[345.1,309.4,202.3,178.5,285.6,309.4,202.3,202.3,214.2,249.9,190.4,202.3,202.3,285.6,238.0,249.9],"ENS. BURRATA":[283.8,309.6,245.1,193.5,374.1,283.8,232.2,219.3,206.4,180.6,193.5,206.4,219.3,232.2,258.0,154.8],"MACARRONES":[387.0,309.6,116.1,232.2,141.9,232.2,270.9,232.2,167.7,232.2,129.0,193.5,335.4,348.3,141.9,232.2],"TATAKI SALMON":[286.4,161.1,232.7,196.9,214.8,196.9,232.7,214.8,214.8,196.9,304.3,89.5,107.4,358.0,214.8,125.3],"TARTAR DE TOMAQUET":[269.7,174.0,191.4,174.0,174.0,217.5,139.2,226.2,200.1,174.0,200.1,234.9,234.9,226.2,243.6,217.5],"HUMMUS":[266.0,237.5,142.5,228.0,142.5,152.0,199.5,209.0,171.0,171.0,247.0,180.5,266.0,199.5,171.0,152.0],"ENSALADILLA RUSSA":[212.5,178.5,93.5,170.0,187.0,161.5,144.5,187.0,170.0,144.5,204.0,170.0,170.0,255.0,263.5,255.0],"MINI CANELONES":[347.5,180.7,97.3,208.5,236.3,139.0,319.7,125.1,97.3,111.2,139.0,180.7,152.9,264.1,180.7,13.9],"ENS. CESAR":[309.6,103.2,77.4,258.0,193.5,129.0,103.2,180.6,232.2,103.2,154.8,90.3,154.8,180.6,116.1,193.5],"PA AMB TOMÀQUET":[248.5,168.0,122.5,143.5,122.5,164.5,185.5,108.5,143.5,126.0,98.0,157.5,140.0,196.0,178.5,140.0],"HAMB. VEGAN":[143.1,222.6,63.6,143.1,111.3,31.8,111.3,79.5,111.3,79.5,143.1,47.7,63.6,159.0,79.5,95.4],"PLATET DE PALETILLA IBÈRICA":[115.2,64.0,128.0,102.4,38.4,102.4,192.0,64.0,89.6,38.4,89.6,102.4,115.2,192.0,140.8,102.4]," FLAUTA \"PEPITO\" DE VEDELLA":[89.6,115.2,89.6,64.0,51.2,76.8,102.4,76.8,12.8,38.4,64.0,140.8,89.6,128.0,51.2,102.4],"FLAUTA LLOM ":[148.2,46.8,39.0,70.2,85.8,39.0,46.8,120.6,132.6,62.4,78.0,46.8,62.4,85.8,62.4,93.6],"MENU 20":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,12.9,0.0,480.0,300.0,160.0]," FLAUTA POLLASTRE":[89.7,48.3,48.3,34.5,62.1,48.3,27.6,62.1,55.2,41.4,41.4,55.2,75.9,27.6,48.3,82.8],"\"GILDA\" DE SEITONS":[63.0,28.0,45.5,17.5,45.5,28.0,66.5,28.0,59.5,45.5,28.0,73.5,52.5,105.0,28.0,73.5]},"uni":{" COCA BUTIFARRA":[144,106,63,99,104,95,91,93,112,76,81,93,92,110,99,90],"COCA PERNIL IBÈRIC":[121,94,60,76,89,86,83,89,86,75,62,92,87,108,83,104],"PATATES BRAVES":[192,145,98,129,143,132,134,158,152,120,120,123,145,189,154,143],"HAMB. AMERICANA":[79,49,37,40,47,60,38,52,52,51,46,30,56,70,43,47],"TIRES DE POLLASTRE":[79,58,44,41,57,43,50,56,42,55,33,61,58,59,58,59],"GUACAMOLE AMB NACHOS":[97,86,47,57,49,55,59,55,48,56,56,53,63,69,59,55],"COCA SOBRASSADA":[74,48,36,45,45,69,53,53,39,46,52,63,59,83,38,45],"COCA DE CARBASSÓ":[58,64,29,40,51,40,47,62,57,43,41,47,52,65,58,47],"QUESADILLES ":[82,58,41,60,51,54,47,76,51,42,53,60,56,69,60,54],"COCA 4 QUESOS":[36,43,31,34,41,36,18,34,31,27,25,38,38,44,35,28],"CROQ. DE ROSTIT 3U":[81,56,37,50,37,44,49,46,39,34,38,42,40,44,42,46],"HAM. IBERICA":[34,15,20,23,15,14,18,24,26,20,27,17,34,23,17,19],"BIKINI TRUFAT":[71,54,30,31,32,32,27,48,37,42,25,37,40,39,42,37],"HAMB. CLÀSSICA":[36,40,19,15,21,18,26,25,24,15,21,26,21,30,18,25],"\"TACOS\" COSTELLA BBQ,":[68,40,23,36,33,31,34,46,53,30,29,32,38,38,39,25],"HAMB. SANTAMASA":[32,26,13,13,30,19,16,25,35,20,14,28,20,33,21,20],"PICANHA":[21,18,13,18,16,15,19,12,20,18,17,12,25,24,8,13],"HAMB. CRISPY CHICKEN":[27,34,14,19,13,24,26,25,28,18,18,20,24,23,15,32],"CROQ. DE PERNIL 3U":[56,37,31,27,32,40,39,34,28,30,34,41,27,43,27,40],"TARTAR ATUN":[18,20,9,17,17,18,12,19,19,11,19,12,17,23,16,11],"STEAK TARTAR":[21,14,19,15,17,17,12,15,18,15,16,19,16,17,12,18],"XAMPINYONS ":[42,31,16,31,35,35,30,32,33,26,24,35,38,28,27,29],"DADOS DE SOLOMILLO":[27,24,15,10,11,14,18,14,17,17,15,13,9,19,17,17],"ENS. FORMATGE DE CABRA":[29,26,21,15,29,32,18,19,19,21,16,18,19,50,35,36],"ENS. BURRATA":[22,24,21,17,33,24,19,18,17,15,15,16,19,18,20,12],"MACARRONES":[30,26,11,20,11,18,22,18,13,18,10,15,26,27,13,19],"TATAKI SALMON":[16,9,13,11,12,11,14,12,14,12,17,5,6,23,13,10],"TARTAR DE TOMAQUET":[31,23,23,22,22,26,16,27,25,22,23,30,29,27,30,30],"HUMMUS":[29,26,16,24,17,17,23,23,19,20,26,19,28,22,18,17],"ENSALADILLA RUSSA":[26,27,12,20,24,20,18,24,21,18,26,22,21,34,34,38],"MINI CANELONES":[25,13,7,15,17,10,25,9,7,8,10,13,11,20,14,2],"ENS. CESAR":[24,8,6,20,15,11,8,15,18,8,12,7,12,14,9,16],"PA AMB TOMÀQUET":[71,48,35,43,35,48,53,31,41,36,28,45,41,56,51,40],"HAMB. VEGAN":[9,14,4,9,7,2,8,5,8,5,9,3,4,10,7,6],"PLATET DE PALETILLA IBÈRICA":[9,5,10,8,3,8,15,5,7,3,7,8,9,15,11,8]," FLAUTA \"PEPITO\" DE VEDELLA":[8,12,7,5,7,8,9,7,5,4,6,13,8,14,6,10],"FLAUTA LLOM ":[25,17,13,12,15,9,7,15,17,8,11,6,8,11,8,12],"MENU 20":[0,0,0,0,0,0,0,0,0,0,0,1,0,24,15,8]," FLAUTA POLLASTRE":[13,7,7,5,9,7,4,10,8,6,6,9,11,7,8,14],"\"GILDA\" DE SEITONS":[18,8,13,5,13,10,19,8,17,13,8,21,15,30,8,21]},"mitja_eur":{" COCA BUTIFARRA":1164.2,"COCA PERNIL IBÈRIC":1164.1,"PATATES BRAVES":971.1,"HAMB. AMERICANA":715.5,"TIRES DE POLLASTRE":636.9,"GUACAMOLE AMB NACHOS":621.9,"COCA SOBRASSADA":617.2,"COCA DE CARBASSÓ":592.2,"QUESADILLES ":473.9,"COCA 4 QUESOS":387.9,"CROQ. DE ROSTIT 3U":366.0,"HAM. IBERICA":339.3,"BIKINI TRUFAT":338.7,"HAMB. CLÀSSICA":334.2,"\"TACOS\" COSTELLA BBQ,":326.0,"HAMB. SANTAMASA":310.1,"PICANHA":297.6,"HAMB. CRISPY CHICKEN":297.0,"CROQ. DE PERNIL 3U":289.7,"TARTAR ATUN":277.1,"STEAK TARTAR":272.5,"XAMPINYONS ":263.4,"DADOS DE SOLOMILLO":257.7,"ENS. FORMATGE DE CABRA":241.7,"ENS. BURRATA":237.0,"MACARRONES":231.4,"TATAKI SALMON":209.2,"TARTAR DE TOMAQUET":206.1,"HUMMUS":195.9,"ENSALADILLA RUSSA":185.4,"MINI CANELONES":174.6,"ENS. CESAR":161.2,"PA AMB TOMÀQUET":152.7,"HAMB. VEGAN":105.3,"PLATET DE PALETILLA IBÈRICA":104.8," FLAUTA \"PEPITO\" DE VEDELLA":80.8,"FLAUTA LLOM ":76.3,"MENU 20":59.6," FLAUTA POLLASTRE":53.0,"\"GILDA\" DE SEITONS":49.2},"mitja_uni":{" COCA BUTIFARRA":96.8,"COCA PERNIL IBÈRIC":87.2,"PATATES BRAVES":142.3,"HAMB. AMERICANA":49.8,"TIRES DE POLLASTRE":53.3,"GUACAMOLE AMB NACHOS":60.2,"COCA SOBRASSADA":53.0,"COCA DE CARBASSÓ":50.1,"QUESADILLES ":57.1,"COCA 4 QUESOS":33.7,"CROQ. DE ROSTIT 3U":45.3,"HAM. IBERICA":21.6,"BIKINI TRUFAT":39.0,"HAMB. CLÀSSICA":23.8,"\"TACOS\" COSTELLA BBQ,":37.2,"HAMB. SANTAMASA":22.8,"PICANHA":16.8,"HAMB. CRISPY CHICKEN":22.5,"CROQ. DE PERNIL 3U":35.4,"TARTAR ATUN":16.1,"STEAK TARTAR":16.3,"XAMPINYONS ":30.8,"DADOS DE SOLOMILLO":16.1,"ENS. FORMATGE DE CABRA":25.2,"ENS. BURRATA":19.4,"MACARRONES":18.6,"TATAKI SALMON":12.4,"TARTAR DE TOMAQUET":25.4,"HUMMUS":21.5,"ENSALADILLA RUSSA":24.1,"MINI CANELONES":12.9,"ENS. CESAR":12.7,"PA AMB TOMÀQUET":43.9,"HAMB. VEGAN":6.9,"PLATET DE PALETILLA IBÈRICA":8.2," FLAUTA \"PEPITO\" DE VEDELLA":8.1,"FLAUTA LLOM ":12.1,"MENU 20":3.0," FLAUTA POLLASTRE":8.2,"\"GILDA\" DE SEITONS":14.2}},"POSTRES":{"order":["TORRIJA BRIOCHE ","COULANT","CHEESECAKE","TIRAMISÚ","BROWNIE","XUXO DE CREMA","CARDINALE","CARPACCIO DE PINYA"],"eur":{"TORRIJA BRIOCHE ":[350.0,245.0,98.0,175.0,280.0,77.0,224.0,280.0,357.0,252.0,336.0,329.0,287.0,112.0,161.0,231.0],"COULANT":[266.5,240.5,260.0,234.0,260.0,188.5,273.0,286.0,162.5,286.0,214.5,169.0,331.5,273.0,149.5,162.5],"CHEESECAKE":[400.2,207.0,117.3,151.8,207.0,241.5,179.4,241.5,207.0,255.3,207.0,227.7,75.9,220.8,151.8,200.1],"TIRAMISÚ":[241.5,186.3,207.0,179.4,220.8,193.2,241.5,172.5,193.2,227.7,220.8,144.9,255.3,220.8,220.8,138.0],"BROWNIE":[214.5,143.0,149.5,143.0,175.5,162.5,130.0,136.5,162.5,195.0,97.5,227.5,182.0,175.5,104.0,143.0],"XUXO DE CREMA":[266.5,247.0,104.0,149.5,143.0,208.0,117.0,97.5,91.0,123.5,117.0,104.0,117.0,260.0,117.0,71.5],"CARDINALE":[69.0,0.0,0.0,0.0,96.6,172.5,110.4,151.8,75.9,82.8,158.7,165.6,117.3,144.9,41.4,75.9],"CARPACCIO DE PINYA":[100.3,53.1,41.3,53.1,53.1,64.9,41.3,76.7,100.3,59.0,76.7,59.0,29.5,70.8,29.5,70.8]},"uni":{"TORRIJA BRIOCHE ":[50,35,14,26,40,11,32,42,51,36,48,47,42,16,23,37],"COULANT":[41,37,41,37,40,29,42,44,25,44,33,27,52,43,23,28],"CHEESECAKE":[58,33,17,24,30,36,27,36,30,39,30,34,11,34,24,31],"TIRAMISÚ":[35,27,30,27,32,28,35,25,28,33,32,22,38,32,32,21],"BROWNIE":[33,24,23,22,27,26,22,21,25,30,16,36,28,27,17,24],"XUXO DE CREMA":[41,38,16,24,22,33,18,16,14,19,19,16,18,40,18,11],"CARDINALE":[10,1,0,0,14,25,16,22,11,12,23,24,17,21,6,11],"CARPACCIO DE PINYA":[17,10,7,9,9,11,7,13,17,10,13,10,5,14,5,13]},"mitja_eur":{"TORRIJA BRIOCHE ":237.1,"COULANT":234.8,"CHEESECAKE":205.7,"TIRAMISÚ":204.0,"BROWNIE":158.8,"XUXO DE CREMA":145.8,"CARDINALE":91.4,"CARPACCIO DE PINYA":61.2},"mitja_uni":{"TORRIJA BRIOCHE ":34.4,"COULANT":36.6,"CHEESECAKE":30.9,"TIRAMISÚ":29.8,"BROWNIE":25.1,"XUXO DE CREMA":22.7,"CARDINALE":13.3,"CARPACCIO DE PINYA":10.6}},"BEGUDES":{"order":["AIGUA 50CL","BARRIL 33 CL","TURIA 33CL","COCA COLA ZERO","COCA COLA 35CL","CLARA 33 CL","TALLAT","COPA CAMIONETA","CAFE SOL","LA CAMIONETA","VICHY 33 CL","COPA SYNERA BLANC","COPA SYNERA NEGRE","VIÑA POMAL","SANTES","COPA VIÑA POMAL","SENSE ALCOHOL TORRADA","SANGRIA DE VI","FUZE TEA","EL PERRO VERDE"],"eur":{"AIGUA 50CL":[1075.2,725.3,470.4,644.0,736.4,616.0,625.1,725.3,610.4,593.6,593.6,646.8,700.0,702.9,632.8,579.8],"BARRIL 33 CL":[623.0,504.0,276.5,346.5,346.5,430.5,416.5,486.5,584.5,343.0,416.5,385.0,633.5,514.5,514.5,497.0],"TURIA 33CL":[378.0,262.8,136.8,136.8,262.8,144.0,169.2,208.8,194.4,118.8,118.8,151.2,194.4,252.0,162.0,219.6],"COCA COLA ZERO":[304.5,217.0,178.5,175.0,154.0,210.0,157.5,189.0,171.5,133.0,192.6,206.5,206.5,192.5,196.0,161.0],"COCA COLA 35CL":[262.5,161.0,140.0,147.0,168.0,133.0,182.0,140.0,175.0,164.5,115.5,147.0,168.0,175.0,119.0,133.0],"CLARA 33 CL":[234.0,115.2,68.4,140.4,144.0,172.8,129.6,180.0,144.0,126.0,115.2,108.0,158.4,180.0,190.8,172.8],"TALLAT":[194.0,132.0,100.0,156.0,156.0,174.0,142.0,126.0,166.0,134.1,122.1,144.0,138.0,146.0,140.0,96.0],"COPA CAMIONETA":[104.0,124.0,132.0,128.0,120.0,176.0,136.0,60.0,148.0,104.0,68.0,128.0,60.0,104.0,92.0,148.0],"CAFE SOL":[162.1,119.1,90.1,115.4,138.7,100.8,97.5,102.6,117.0,79.4,86.5,91.8,91.9,138.8,93.5,84.6],"LA CAMIONETA":[163.8,72.8,127.4,91.0,182.0,72.8,109.2,54.6,109.2,91.0,72.8,91.0,91.0,72.8,54.6,72.8],"VICHY 33 CL":[96.0,80.0,96.0,105.6,67.2,102.4,64.0,105.6,112.0,96.0,76.8,70.4,67.2,92.8,76.8,89.6],"COPA SYNERA BLANC":[60.8,60.8,26.6,64.6,49.4,45.6,53.2,60.8,87.4,45.6,174.8,110.2,102.6,140.6,110.2,129.2],"COPA SYNERA NEGRE":[114.0,72.2,64.6,79.8,79.8,72.2,30.4,64.6,106.4,98.8,79.8,79.8,60.8,132.2,72.2,68.4],"VIÑA POMAL":[39.2,78.4,78.4,19.6,58.8,98.0,156.8,98.0,19.6,0.0,39.2,117.6,19.6,78.4,78.4,58.8],"SANTES":[130.8,43.6,43.6,130.8,109.0,0.0,65.4,43.6,0.0,130.8,21.8,43.6,43.6,109.0,109.0,0.0],"COPA VIÑA POMAL":[26.4,57.2,83.6,52.8,39.6,48.4,88.0,30.8,61.6,104.2,35.2,52.8,61.6,66.0,30.8,66.0],"SENSE ALCOHOL TORRADA":[57.6,39.6,54.0,28.8,64.8,61.2,36.0,75.6,32.4,46.8,50.4,40.8,43.2,90.0,68.4,100.8],"SANGRIA DE VI":[48.0,120.0,0.0,0.0,96.0,0.0,48.0,120.0,96.0,24.0,24.0,48.0,0.0,120.0,72.0,72.0],"FUZE TEA":[73.5,101.5,35.0,42.0,56.0,38.5,56.0,52.5,85.0,46.5,42.0,42.0,49.5,49.0,52.5,45.5],"EL PERRO VERDE":[71.7,119.5,71.7,23.9,23.9,23.9,47.8,119.5,23.9,23.9,143.4,23.9,47.8,71.7,0.0,23.9]},"uni":{"AIGUA 50CL":[384,259,170,241,264,224,226,259,218,214,212,232,254,266,235,221],"BARRIL 33 CL":[178,144,79,101,99,123,119,139,167,98,119,110,181,158,152,148],"TURIA 33CL":[105,74,38,40,73,40,47,58,54,33,33,42,54,70,45,61],"COCA COLA ZERO":[88,67,51,50,44,60,45,54,50,38,55,59,59,59,56,50],"COCA COLA 35CL":[76,46,41,43,48,39,52,40,50,47,33,42,49,52,39,38],"CLARA 33 CL":[65,32,19,39,40,48,36,50,40,35,32,30,44,54,53,50],"TALLAT":[98,68,50,78,78,87,71,63,83,68,61,72,69,74,70,52],"COPA CAMIONETA":[26,31,33,32,30,44,34,15,37,26,17,32,15,26,23,37],"CAFE SOL":[91,67,50,65,77,57,54,57,65,44,48,51,52,79,52,47],"LA CAMIONETA":[9,4,7,5,10,4,6,3,6,5,4,5,5,4,3,4],"VICHY 33 CL":[30,26,30,33,21,35,21,34,35,31,24,22,22,29,25,30],"COPA SYNERA BLANC":[16,16,7,17,13,12,14,16,23,12,46,29,27,39,34,37],"COPA SYNERA NEGRE":[30,19,17,21,21,19,8,17,28,26,21,21,16,38,19,20],"VIÑA POMAL":[2,4,4,1,3,5,8,5,1,0,2,6,1,4,4,3],"SANTES":[6,2,4,6,6,0,3,2,0,6,1,2,2,5,5,0],"COPA VIÑA POMAL":[6,13,19,12,9,11,20,7,14,24,8,12,14,15,7,15],"SENSE ALCOHOL TORRADA":[16,13,15,8,18,17,10,21,9,13,14,11,12,26,19,30],"SANGRIA DE VI":[2,5,0,1,4,0,2,5,4,1,1,2,0,5,3,3],"FUZE TEA":[21,29,11,12,16,11,16,17,25,14,12,12,18,15,15,13],"EL PERRO VERDE":[3,5,3,1,1,1,2,5,1,1,6,1,2,3,0,1]},"mitja_eur":{"AIGUA 50CL":667.4,"BARRIL 33 CL":457.4,"TURIA 33CL":194.4,"COCA COLA ZERO":190.3,"COCA COLA 35CL":158.2,"CLARA 33 CL":148.7,"TALLAT":141.6,"COPA CAMIONETA":114.5,"CAFE SOL":106.9,"LA CAMIONETA":95.6,"VICHY 33 CL":87.4,"COPA SYNERA BLANC":82.7,"COPA SYNERA NEGRE":79.8,"VIÑA POMAL":64.9,"SANTES":64.0,"COPA VIÑA POMAL":56.6,"SENSE ALCOHOL TORRADA":55.6,"SANGRIA DE VI":55.5,"FUZE TEA":54.2,"EL PERRO VERDE":53.8},"mitja_uni":{"AIGUA 50CL":242.4,"BARRIL 33 CL":132.2,"TURIA 33CL":54.2,"COCA COLA ZERO":55.3,"COCA COLA 35CL":45.9,"CLARA 33 CL":41.7,"TALLAT":71.4,"COPA CAMIONETA":28.6,"CAFE SOL":59.8,"LA CAMIONETA":5.2,"VICHY 33 CL":28.0,"COPA SYNERA BLANC":22.4,"COPA SYNERA NEGRE":21.3,"VIÑA POMAL":3.3,"SANTES":3.1,"COPA VIÑA POMAL":12.9,"SENSE ALCOHOL TORRADA":15.8,"SANGRIA DE VI":2.4,"FUZE TEA":16.1,"EL PERRO VERDE":2.2}}}},"Picu Sabadell":{"fam":{"order":["MENU","TAPES","BEGUDES","COQUES","AMANIDES I VERDURETES","POSTRES","VINS I CAVES","CAFES & INFUSIONS","PANS","XARRUPS","LICORS","SALSES","ALTRES"],"eur":{"MENU":[11209.7,6427.1,6247.9,1245.7,5380.2,6753.0,4906.0,8553.0,6979.9,7399.9,4992.9,6549.2,6935.8,6803.5,4743.9,6930.2],"TAPES":[7845.5,7412.0,3794.5,3280.9,6580.8,4862.1,6257.3,5771.2,5866.9,5576.5,4988.3,5988.6,5713.3,7522.1,6770.2,6177.9],"BEGUDES":[2226.4,2013.8,1095.7,938.0,1542.0,1337.0,1429.5,1625.1,1596.1,1353.7,1358.8,1675.7,1449.0,1748.7,1768.2,1606.8],"COQUES":[1553.0,994.0,873.6,692.4,1219.2,932.0,922.4,855.6,1212.4,814.8,959.8,1067.4,1147.4,1163.8,1124.2,814.8],"AMANIDES I VERDURETES":[1328.1,1313.6,599.7,653.8,1013.4,1031.1,1006.3,1008.9,976.8,871.7,903.6,1129.5,902.7,1252.9,1095.7,1051.3],"POSTRES":[1237.4,1043.7,665.6,607.5,1007.0,698.4,1019.3,735.2,1000.3,899.9,803.7,1012.3,828.2,989.9,1141.2,971.1],"VINS I CAVES":[947.5,718.5,702.5,467.0,1051.5,759.5,903.5,587.5,906.0,728.5,721.5,658.5,1015.0,1163.5,839.5,645.5],"CAFES & INFUSIONS":[449.9,375.3,237.3,129.7,275.2,305.0,259.3,355.2,259.3,376.6,262.9,309.4,294.2,341.7,324.5,280.6],"PANS":[163.6,170.9,57.8,55.1,166.0,143.8,146.1,121.9,137.3,103.9,87.1,139.8,147.1,162.6,108.6,169.2],"XARRUPS":[44.0,30.0,20.0,3.0,32.0,30.0,39.0,42.0,60.0,9.0,35.0,30.0,9.0,32.0,6.0,30.0],"LICORS":[30.0,103.1,61.5,0.0,19.0,13.9,22.9,3.9,3.9,0.0,29.9,47.0,36.6,11.0,3.9,14.9],"SALSES":[0.4,0.4,0.0,0.0,0.4,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"ALTRES":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]},"uni":{"MENU":[586,425,377,46,376,418,345,523,412,379,329,380,464,452,285,448],"TAPES":[1106,882,587,303,742,698,711,849,803,779,631,788,737,907,766,796],"BEGUDES":[978,813,488,286,616,608,595,741,704,602,577,715,655,752,670,702],"COQUES":[252,139,126,65,158,135,129,163,157,122,134,148,168,169,130,141],"AMANIDES I VERDURETES":[250,208,145,65,161,173,179,180,186,174,159,190,177,192,165,184],"POSTRES":[563,389,323,118,348,341,345,403,400,388,308,380,366,407,314,382],"VINS I CAVES":[107,56,74,29,87,72,67,74,83,78,60,71,93,86,65,73],"CAFES & INFUSIONS":[338,242,171,84,200,230,194,254,220,254,191,216,222,240,224,238],"PANS":[107,84,44,33,80,78,74,80,78,72,50,76,76,84,63,89],"XARRUPS":[18,11,6,1,10,10,14,16,23,5,15,11,4,10,2,10],"LICORS":[6,22,12,0,4,3,5,1,1,0,6,9,9,2,1,3],"SALSES":[38,27,23,4,26,26,15,26,18,21,15,18,33,30,20,16],"ALTRES":[698,596,422,184,475,445,485,590,525,512,417,524,511,571,428,529]},"mitja_eur":{"MENU":6378.6,"TAPES":5900.5,"BEGUDES":1547.8,"COQUES":1021.7,"AMANIDES I VERDURETES":1008.7,"POSTRES":916.3,"VINS I CAVES":801.0,"CAFES & INFUSIONS":302.3,"PANS":130.0,"XARRUPS":28.2,"LICORS":25.1,"SALSES":0.1,"ALTRES":0.0},"mitja_uni":{"MENU":390.3,"TAPES":755.3,"BEGUDES":656.4,"COQUES":146.0,"AMANIDES I VERDURETES":174.2,"POSTRES":360.9,"VINS I CAVES":73.4,"CAFES & INFUSIONS":219.9,"PANS":73.0,"XARRUPS":10.4,"LICORS":5.2,"SALSES":22.3,"ALTRES":494.5}},"art":{"MENJAR":{"order":["MENU DIA","OUS PERNIL","TXOCOS","G-MENU PICAPLAT 4 PAX","G-MENU PICUTEIG 4PAX","COCA POLLASTRE","PATATES BRAVES","TIRES POLLASTRE","SECRET IBERIC","FLOR CARXOFA","TARTAR DE SALMO","STEAK TARTAR","COCA BOTIFARRA","ENTRAÑA VEDELLA","MENU REDUIT","G-MENU DEGUSTACIO 4 PAX","PROVOLONE FOS","BURRATA OBERTA","CROQUETES ROSTIT","CROQUETA PERNIL","COCA VERDURETES","BIKINI","BOTI LLEIDA","BURGER PICUTEIG","VARIS","MINI CANELONS","ENSALADILLA ","ENTRECOT","M- PICAPLAT FESTES 4 PAX","AMANIDA CABRA","ESQUEIXADA","AMANIDA VENTRESCA","HUMMUS","PA TOMATA","LAMINAS ROAST BEEF","MACARRONS L AVIA","SALMO PLANXA","CUIXA DE POLLASTRE","PASTANAGUES ","LINGUINE"],"eur":{"MENU DIA":[6078.6,4375.8,3801.6,0.0,3484.8,4138.2,3663.0,5643.0,4435.2,3762.0,3564.0,3861.0,4870.8,4851.0,2910.6,4692.6],"OUS PERNIL":[957.2,1028.6,458.7,486.5,1000.8,514.3,864.8,625.5,653.3,778.4,583.8,639.4,569.9,1003.8,695.0,681.1],"TXOCOS":[852.5,775.0,418.5,310.0,868.0,496.0,682.0,635.5,666.5,713.0,434.0,790.5,496.0,883.5,945.5,682.0],"G-MENU PICAPLAT 4 PAX":[432.0,720.0,1008.0,288.0,288.0,576.0,144.0,576.0,1296.0,1836.0,144.0,576.0,0.0,432.0,864.0,576.0],"G-MENU PICUTEIG 4PAX":[928.0,116.0,232.0,348.0,435.0,696.0,464.0,1276.0,116.0,116.0,580.0,464.0,928.0,580.0,232.0,580.0],"COCA POLLASTRE":[798.0,444.6,387.6,353.4,444.6,490.2,444.6,456.0,615.6,376.2,513.0,478.8,478.8,535.8,638.4,421.8],"PATATES BRAVES":[765.9,545.1,324.3,282.9,434.7,420.9,414.0,441.6,531.3,372.6,386.4,503.7,483.0,510.6,545.1,503.7],"TIRES POLLASTRE":[606.3,635.1,235.2,245.1,412.8,338.4,528.9,387.0,464.4,415.8,325.5,490.2,490.2,490.2,593.4,490.2],"SECRET IBERIC":[559.5,681.5,303.0,166.5,404.0,274.5,614.0,480.5,443.0,243.5,439.0,317.5,371.0,451.0,333.5,449.5],"FLOR CARXOFA":[394.8,411.6,193.2,193.2,394.8,378.0,344.4,310.8,310.8,294.0,336.0,470.4,310.8,378.0,378.0,336.0],"TARTAR DE SALMO":[346.0,281.0,124.5,99.0,407.0,251.0,263.5,410.0,332.5,375.0,266.5,339.0,396.5,555.5,476.0,502.5],"STEAK TARTAR":[362.5,372.0,236.0,140.0,521.5,210.5,286.5,304.5,378.0,319.0,278.5,315.5,311.5,518.0,399.0,401.0],"COCA BOTIFARRA":[421.8,353.4,250.8,250.8,421.8,285.0,262.2,193.8,342.0,262.2,250.8,353.4,364.8,285.0,319.2,216.6],"ENTRAÑA VEDELLA":[472.5,385.0,175.0,245.0,262.5,245.0,437.5,262.5,315.0,332.5,87.5,262.5,402.5,245.0,350.0,297.5],"MENU REDUIT":[178.8,208.6,357.6,0.0,357.6,491.7,163.9,357.6,298.0,283.1,283.1,312.9,372.5,216.0,134.1,491.7],"G-MENU DEGUSTACIO 4 PAX":[408.0,408.0,408.0,0.0,238.0,252.0,0.0,136.0,272.0,816.0,0.0,816.0,272.0,136.0,136.0,136.0],"PROVOLONE FOS":[388.8,270.0,216.0,205.2,270.0,205.2,280.8,237.6,259.2,259.2,226.8,280.8,162.0,302.4,302.4,118.8],"BURRATA OBERTA":[393.3,307.9,172.9,139.0,220.5,327.8,190.7,161.0,286.1,162.9,218.5,371.4,194.8,284.1,226.4,178.9],"CROQUETES ROSTIT":[197.8,275.2,172.0,163.4,120.4,206.4,197.8,172.0,197.8,172.0,369.8,309.6,292.4,421.4,206.4,232.2],"CROQUETA PERNIL":[404.2,292.4,137.6,68.8,283.8,312.1,266.6,223.6,206.4,180.6,232.2,172.0,154.8,275.2,94.6,266.6],"COCA VERDURETES":[323.4,196.0,225.4,88.2,352.8,156.8,205.8,205.8,245.0,166.6,196.0,235.2,294.0,333.2,156.8,176.4],"BIKINI":[279.0,306.9,93.0,139.5,186.0,195.3,176.7,148.8,186.0,186.0,325.5,260.4,158.1,316.2,279.0,306.9],"BOTI LLEIDA":[309.4,202.3,142.8,119.0,190.4,202.3,202.3,214.2,309.4,178.5,154.7,273.7,166.6,166.6,214.2,71.4],"BURGER PICUTEIG":[264.4,153.1,147.1,143.1,176.9,115.3,131.2,175.0,41.8,274.3,216.7,192.8,246.5,264.4,212.7,262.4],"VARIS":[182.8,68.8,178.8,317.1,100.0,276.6,157.9,226.1,153.6,300.2,194.4,235.7,181.8,195.8,40.4,141.4],"MINI CANELONS":[212.4,306.8,94.4,153.4,236.0,165.2,129.8,153.4,153.4,106.2,82.6,118.0,141.6,177.0,177.0,165.2],"ENSALADILLA ":[163.8,179.4,70.2,54.6,132.6,101.4,117.0,218.4,117.0,163.8,132.6,179.4,117.0,226.2,257.4,171.6],"ENTRECOT":[154.5,105.5,65.0,49.0,114.0,333.5,220.5,105.5,114.0,81.5,89.0,56.5,350.5,236.5,122.5,179.0],"M- PICAPLAT FESTES 4 PAX":[2340.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"AMANIDA CABRA":[153.4,188.8,47.2,129.8,177.0,70.8,177.0,141.6,70.8,141.6,129.8,118.0,94.4,212.4,153.4,247.8],"ESQUEIXADA":[178.5,136.5,105.0,31.5,189.0,94.5,84.0,52.5,168.0,147.0,105.0,105.0,147.0,210.0,189.0,136.5],"AMANIDA VENTRESCA":[208.7,210.6,79.6,55.6,93.4,139.1,155.0,71.6,155.1,95.4,89.5,71.6,151.1,194.7,157.0,113.3],"HUMMUS":[141.0,112.8,47.0,75.2,169.2,131.6,122.2,141.0,112.8,75.2,75.2,159.8,103.4,159.8,178.6,150.4],"PA TOMATA":[147.5,155.0,55.0,52.5,152.5,142.5,135.0,112.5,122.5,100.0,82.5,130.0,142.5,150.0,90.0,135.0],"LAMINAS ROAST BEEF":[123.2,234.0,92.4,30.8,61.6,61.6,77.0,277.2,138.6,77.0,61.6,123.2,92.4,184.8,169.4,77.0],"MACARRONS L AVIA":[228.9,152.6,21.8,87.2,141.7,87.2,130.8,109.0,152.6,87.2,87.2,109.0,98.1,87.2,130.8,54.5],"SALMO PLANXA":[74.0,129.5,55.5,55.5,148.0,37.0,74.0,74.0,37.0,92.5,92.5,92.5,129.5,55.5,74.0,114.5],"CUIXA DE POLLASTRE":[72.5,130.5,72.5,101.5,72.5,43.5,87.0,72.5,58.0,130.5,72.5,116.0,72.5,29.0,116.0,58.0],"PASTANAGUES ":[62.3,79.1,106.8,80.1,80.1,71.2,71.2,133.5,97.9,97.9,89.0,26.7,44.5,115.7,53.4,80.1],"LINGUINE":[187.2,62.4,124.8,52.0,83.2,42.1,41.6,52.0,83.2,83.2,41.6,41.6,52.0,114.4,104.0,72.8]},"uni":{"MENU DIA":[312,223,194,0,180,209,193,286,227,196,182,197,247,246,149,239],"OUS PERNIL":[114,92,46,38,100,68,90,73,64,70,59,69,75,112,68,83],"TXOCOS":[55,50,27,20,56,32,44,42,43,46,28,51,32,57,61,44],"G-MENU PICAPLAT 4 PAX":[3,5,7,2,2,4,1,4,9,13,1,4,0,3,6,4],"G-MENU PICUTEIG 4PAX":[8,1,2,3,4,6,4,11,1,1,5,4,8,5,2,5],"COCA POLLASTRE":[118,55,59,34,56,69,52,86,74,57,76,70,72,79,69,59],"PATATES BRAVES":[143,89,59,46,70,73,66,80,89,74,62,87,80,83,91,83],"TIRES POLLASTRE":[70,66,30,19,40,38,57,62,57,48,38,53,55,56,55,54],"SECRET IBERIC":[77,59,43,11,37,34,45,54,48,43,40,44,39,52,37,43],"FLOR CARXOFA":[47,49,23,24,48,45,43,37,37,35,40,56,38,45,45,40],"TARTAR DE SALMO":[47,40,24,11,43,41,35,50,39,48,39,40,54,51,48,64],"STEAK TARTAR":[40,34,28,8,38,22,29,34,37,43,24,29,25,44,31,32],"COCA BOTIFARRA":[38,32,22,22,40,25,25,18,30,24,22,32,33,25,29,19],"ENTRAÑA VEDELLA":[92,55,56,15,39,48,52,56,69,60,43,52,56,48,42,41],"MENU REDUIT":[14,14,24,0,25,35,12,27,20,21,21,25,27,18,12,34],"G-MENU DEGUSTACIO 4 PAX":[3,3,3,0,2,2,0,1,2,6,0,6,2,1,1,1],"PROVOLONE FOS":[39,28,23,19,27,21,26,23,26,30,21,32,17,29,29,12],"BURRATA OBERTA":[58,35,28,12,22,37,19,25,39,30,21,35,26,32,25,28],"CROQUETES ROSTIT":[42,37,27,21,15,29,24,24,32,34,44,40,34,52,30,31],"CROQUETA PERNIL":[47,35,16,8,33,39,34,26,24,21,27,20,19,32,11,31],"COCA VERDURETES":[79,52,44,9,61,41,51,59,52,39,36,46,62,64,31,63],"BIKINI":[33,38,17,17,21,25,20,20,29,33,36,32,17,37,36,37],"BOTI LLEIDA":[57,33,34,15,44,42,34,51,54,31,28,47,38,35,34,30],"BURGER PICUTEIG":[23,14,12,9,12,10,10,18,7,20,18,13,20,21,16,22],"VARIS":[12,7,11,15,12,18,14,10,9,10,14,11,10,8,4,7],"MINI CANELONS":[47,54,38,13,44,42,33,42,37,26,23,32,39,48,23,42],"ENSALADILLA ":[41,40,25,7,30,29,25,51,33,42,24,42,25,53,51,45],"ENTRECOT":[9,7,4,2,6,19,9,8,6,4,7,5,17,11,6,11],"M- PICAPLAT FESTES 4 PAX":[16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"AMANIDA CABRA":[49,48,26,11,41,37,45,37,33,39,33,45,37,46,39,53],"ESQUEIXADA":[44,39,36,3,44,44,27,51,53,30,33,41,57,48,44,51],"AMANIDA VENTRESCA":[31,23,17,4,11,16,18,12,25,12,15,12,23,21,21,15],"HUMMUS":[37,26,15,11,27,30,21,34,25,27,22,34,30,32,28,24],"PA TOMATA":[97,74,40,31,72,77,65,75,70,68,47,68,73,76,52,72],"LAMINAS ROAST BEEF":[29,37,27,3,15,23,21,50,30,33,14,25,22,31,22,24],"MACARRONS L AVIA":[46,41,19,8,35,22,37,46,29,26,34,31,38,30,27,27],"SALMO PLANXA":[4,9,6,4,9,2,4,8,6,10,5,5,7,3,7,7],"CUIXA DE POLLASTRE":[25,32,20,8,17,19,23,20,17,31,16,26,18,19,17,24],"PASTANAGUES ":[32,21,31,9,29,17,20,22,31,33,20,19,21,22,11,22],"LINGUINE":[53,20,24,5,22,19,11,22,20,26,14,16,31,38,21,24]},"mitja_eur":{"MENU DIA":4008.3,"OUS PERNIL":721.3,"TXOCOS":665.5,"G-MENU PICAPLAT 4 PAX":609.8,"G-MENU PICUTEIG 4PAX":505.7,"COCA POLLASTRE":492.3,"PATATES BRAVES":466.6,"TIRES POLLASTRE":446.8,"SECRET IBERIC":408.2,"FLOR CARXOFA":339.7,"TARTAR DE SALMO":339.1,"STEAK TARTAR":334.6,"COCA BOTIFARRA":302.1,"ENTRAÑA VEDELLA":298.6,"MENU REDUIT":281.7,"G-MENU DEGUSTACIO 4 PAX":277.1,"PROVOLONE FOS":249.1,"BURRATA OBERTA":239.8,"CROQUETES ROSTIT":231.7,"CROQUETA PERNIL":223.2,"COCA VERDURETES":222.3,"BIKINI":221.5,"BOTI LLEIDA":194.9,"BURGER PICUTEIG":188.6,"VARIS":184.5,"MINI CANELONS":160.8,"ENSALADILLA ":150.1,"ENTRECOT":148.6,"M- PICAPLAT FESTES 4 PAX":146.2,"AMANIDA CABRA":140.9,"ESQUEIXADA":129.9,"AMANIDA VENTRESCA":127.6,"HUMMUS":122.2,"PA TOMATA":119.1,"LAMINAS ROAST BEEF":117.6,"MACARRONS L AVIA":110.4,"SALMO PLANXA":83.5,"CUIXA DE POLLASTRE":81.6,"PASTANAGUES ":80.6,"LINGUINE":77.4},"mitja_uni":{"MENU DIA":205.0,"OUS PERNIL":76.3,"TXOCOS":43.0,"G-MENU PICAPLAT 4 PAX":4.2,"G-MENU PICUTEIG 4PAX":4.4,"COCA POLLASTRE":67.8,"PATATES BRAVES":79.7,"TIRES POLLASTRE":49.9,"SECRET IBERIC":44.1,"FLOR CARXOFA":40.8,"TARTAR DE SALMO":42.1,"STEAK TARTAR":31.1,"COCA BOTIFARRA":27.2,"ENTRAÑA VEDELLA":51.5,"MENU REDUIT":20.6,"G-MENU DEGUSTACIO 4 PAX":2.1,"PROVOLONE FOS":25.1,"BURRATA OBERTA":29.5,"CROQUETES ROSTIT":32.2,"CROQUETA PERNIL":26.4,"COCA VERDURETES":49.3,"BIKINI":28.0,"BOTI LLEIDA":37.9,"BURGER PICUTEIG":15.3,"VARIS":10.8,"MINI CANELONS":36.4,"ENSALADILLA ":35.2,"ENTRECOT":8.2,"M- PICAPLAT FESTES 4 PAX":1.0,"AMANIDA CABRA":38.7,"ESQUEIXADA":40.3,"AMANIDA VENTRESCA":17.2,"HUMMUS":26.4,"PA TOMATA":66.1,"LAMINAS ROAST BEEF":25.4,"MACARRONS L AVIA":31.0,"SALMO PLANXA":6.0,"CUIXA DE POLLASTRE":20.8,"PASTANAGUES ":22.5,"LINGUINE":22.9}},"POSTRES":{"order":["COULANT XOCOLATA","CHEESECAKE","TIRAMISU","TARTALETA DE POMA","BROWNIE","CARPACCIO PINYA","SOPETA MARACUYA","FLAM D'OU AMB NATA"],"eur":{"COULANT XOCOLATA":[319.6,210.8,129.2,170.0,238.0,122.4,231.2,163.2,197.2,244.9,149.6,238.0,183.6,224.4,184.6,231.2],"CHEESECAKE":[253.5,188.5,110.5,91.0,221.0,97.5,188.5,123.5,202.5,130.0,182.0,123.5,188.5,156.0,227.5,149.5],"TIRAMISU":[149.6,142.8,68.0,34.0,149.6,129.2,115.6,108.8,149.6,108.8,129.2,136.0,81.6,183.6,142.8,129.2],"TARTALETA DE POMA":[74.8,47.6,68.0,27.2,95.2,81.6,81.6,81.6,136.0,136.0,122.4,108.8,102.0,115.6,142.8,156.4],"BROWNIE":[88.4,102.0,68.0,81.6,61.2,81.6,81.6,81.6,115.6,61.2,68.0,115.6,74.8,61.2,108.8,47.6],"CARPACCIO PINYA":[82.5,38.5,27.5,38.5,59.0,64.5,38.5,27.5,49.5,22.0,37.0,77.0,38.5,49.5,38.5,62.3],"SOPETA MARACUYA":[71.5,22.0,44.0,27.5,60.5,27.5,49.5,38.5,38.5,38.5,22.0,55.0,38.5,44.0,38.5,11.0],"FLAM D'OU AMB NATA":[44.0,66.0,27.5,38.5,27.5,27.5,71.5,44.0,27.5,22.0,27.5,38.5,33.0,44.0,44.0,38.5]},"uni":{"COULANT XOCOLATA":[78,51,38,31,39,33,41,43,41,59,39,45,37,46,41,43],"CHEESECAKE":[68,38,30,18,38,32,36,23,51,39,32,35,35,33,39,29],"TIRAMISU":[27,21,10,5,26,19,18,19,23,17,19,23,16,27,21,23],"TARTALETA DE POMA":[14,7,10,4,14,12,12,12,20,20,18,16,15,17,21,23],"BROWNIE":[60,44,29,12,39,42,39,66,39,35,39,47,44,60,30,34],"CARPACCIO PINYA":[20,8,8,9,14,16,14,6,13,10,10,19,11,12,10,20],"SOPETA MARACUYA":[50,29,39,5,29,23,28,45,36,40,18,29,31,31,20,19],"FLAM D'OU AMB NATA":[46,23,15,9,19,33,25,18,29,23,25,29,31,25,16,23]},"mitja_eur":{"COULANT XOCOLATA":202.4,"CHEESECAKE":164.6,"TIRAMISU":122.4,"TARTALETA DE POMA":98.6,"BROWNIE":81.2,"CARPACCIO PINYA":46.9,"SOPETA MARACUYA":39.2,"FLAM D'OU AMB NATA":38.8},"mitja_uni":{"COULANT XOCOLATA":44.1,"CHEESECAKE":36.0,"TIRAMISU":19.6,"TARTALETA DE POMA":14.7,"BROWNIE":41.2,"CARPACCIO PINYA":12.5,"SOPETA MARACUYA":29.5,"FLAM D'OU AMB NATA":24.3}},"BEGUDES":{"order":["AGUA","CANYA 33 CL","LA CAMIONETA","TALLAT","COCA COLA ZERO","C. BODEGA NEGRE","CAFE","C. BLANC BODEGA","SANGRIA CAVA","COCA COLA","CLARA 33 CL","SANTES","SANGRIA VI","TURIA","GESSAMI","VIÑA POMAL","PULPO","RAMON LIMITED","SYNERA NEGRE","NESTEA"],"eur":{"AGUA":[512.4,445.2,282.8,190.4,420.0,338.8,439.6,375.2,417.2,288.4,322.0,434.0,364.0,383.6,462.0,431.2],"CANYA 33 CL":[504.0,440.4,248.5,238.0,268.9,304.5,243.2,283.5,373.3,338.9,304.5,352.9,202.4,412.4,448.0,311.5],"LA CAMIONETA":[115.0,111.0,152.0,37.0,190.0,111.0,111.0,22.5,92.5,104.5,156.0,41.0,105.5,141.5,129.5,129.5],"TALLAT":[160.2,142.0,79.2,68.2,95.4,88.2,75.6,138.6,75.4,134.8,90.0,127.6,97.2,97.0,120.6,104.4],"COCA COLA ZERO":[150.5,133.0,59.5,59.5,84.0,94.5,105.0,98.0,119.0,94.5,91.0,98.0,80.5,142.5,161.0,112.0],"C. BODEGA NEGRE":[162.0,126.0,85.5,58.5,112.5,121.5,54.0,94.5,81.0,76.5,121.5,103.5,121.5,90.0,102.0,94.0],"CAFE":[178.5,89.7,61.2,38.9,84.4,107.8,95.2,115.2,100.1,137.5,106.9,71.4,99.9,108.8,78.2,110.5],"C. BLANC BODEGA":[160.0,133.0,49.6,38.0,117.8,121.8,68.4,118.0,91.2,114.0,76.0,102.6,87.4,87.4,72.2,79.8],"SANGRIA CAVA":[180.0,67.5,67.5,45.0,54.0,100.0,180.0,45.0,67.5,22.5,90.0,22.5,77.5,95.0,135.0,22.5],"COCA COLA":[101.5,98.0,70.0,49.0,80.5,63.0,101.5,94.5,73.5,63.0,70.0,38.5,98.0,87.5,77.0,73.5],"CLARA 33 CL":[90.0,75.6,14.4,43.2,93.6,46.8,46.8,100.8,111.6,68.4,75.6,75.6,111.6,100.8,86.4,43.2],"SANTES":[136.5,78.0,19.5,78.0,210.0,39.0,19.5,58.5,39.0,136.5,15.0,58.5,78.0,78.0,58.5,78.0],"SANGRIA VI":[43.0,21.5,43.0,107.5,64.5,0.0,129.0,43.0,172.0,64.5,21.5,21.5,172.0,129.0,43.0,86.0],"TURIA":[64.8,50.4,14.4,64.8,54.0,61.2,61.2,126.0,50.4,32.4,36.0,79.2,43.2,61.2,61.2,57.6],"GESSAMI":[32.0,66.0,88.0,0.0,98.0,66.0,88.0,0.0,44.0,22.0,66.0,88.0,115.0,66.0,22.0,22.0],"VIÑA POMAL":[4.0,4.0,80.5,25.5,0.0,4.0,29.5,76.5,63.0,64.5,51.0,20.0,37.5,98.0,162.5,59.0],"PULPO":[0.0,43.0,0.0,0.0,21.5,86.0,43.0,43.0,0.0,0.0,107.5,150.5,21.5,64.5,21.5,43.0],"RAMON LIMITED":[29.5,34.5,78.5,5.0,59.0,29.5,29.5,24.5,103.0,58.0,54.0,0.0,24.5,54.0,0.0,20.0],"SYNERA NEGRE":[68.0,34.0,0.0,17.0,68.0,17.0,51.0,17.0,51.0,17.0,34.0,34.0,34.0,34.0,51.0,51.0],"NESTEA":[70.0,45.5,21.0,35.0,38.5,14.0,38.5,28.0,35.0,31.5,49.0,28.0,28.0,17.5,35.0,28.0]},"uni":{"AGUA":[297,242,144,69,200,181,221,248,213,177,168,225,213,241,204,237],"CANYA 33 CL":[212,170,107,70,97,135,98,109,144,134,122,149,104,155,167,129],"LA CAMIONETA":[8,9,10,2,11,6,6,2,8,12,10,3,8,10,7,7],"TALLAT":[135,104,60,44,76,78,65,105,75,96,63,88,71,89,91,88],"COCA COLA ZERO":[75,64,42,18,50,63,44,59,59,56,43,43,41,59,63,55],"C. BODEGA NEGRE":[36,28,19,13,25,27,12,21,18,17,27,23,27,20,23,21],"CAFE":[138,72,62,27,75,96,90,97,89,104,91,72,90,86,65,97],"C. BLANC BODEGA":[42,35,13,10,31,32,18,31,24,30,20,27,23,23,19,21],"SANGRIA CAVA":[11,3,6,2,3,6,8,2,3,7,4,8,5,8,6,2],"COCA COLA":[50,46,30,14,37,36,36,47,43,29,36,28,48,37,37,33],"CLARA 33 CL":[40,28,8,13,28,15,16,35,37,23,25,28,36,41,30,14],"SANTES":[7,4,4,4,11,2,1,5,2,7,3,3,4,4,3,4],"SANGRIA VI":[2,3,5,7,4,2,9,3,9,4,1,2,12,7,3,12],"TURIA":[21,16,5,18,18,17,17,42,23,9,12,24,14,17,17,17],"GESSAMI":[6,3,4,0,6,3,4,0,2,1,3,4,6,3,1,1],"VIÑA POMAL":[1,1,7,2,0,1,3,6,7,7,4,5,6,7,10,8],"PULPO":[1,2,0,0,1,4,2,2,0,0,5,7,1,3,1,2],"RAMON LIMITED":[2,2,4,1,4,2,2,1,5,4,3,0,1,3,0,3],"SYNERA NEGRE":[21,8,8,1,18,14,8,16,14,14,10,13,9,6,8,14],"NESTEA":[29,15,10,12,14,4,15,17,14,12,17,19,13,10,12,14]},"mitja_eur":{"AGUA":381.7,"CANYA 33 CL":329.7,"LA CAMIONETA":109.3,"TALLAT":105.9,"COCA COLA ZERO":105.2,"C. BODEGA NEGRE":100.3,"CAFE":99.0,"C. BLANC BODEGA":94.8,"SANGRIA CAVA":79.5,"COCA COLA":77.4,"CLARA 33 CL":74.0,"SANTES":73.8,"SANGRIA VI":72.6,"TURIA":57.4,"GESSAMI":55.2,"VIÑA POMAL":48.7,"PULPO":40.3,"RAMON LIMITED":37.7,"SYNERA NEGRE":36.1,"NESTEA":33.9},"mitja_uni":{"AGUA":205.0,"CANYA 33 CL":131.4,"LA CAMIONETA":7.4,"TALLAT":83.0,"COCA COLA ZERO":52.2,"C. BODEGA NEGRE":22.3,"CAFE":84.4,"C. BLANC BODEGA":24.9,"SANGRIA CAVA":5.2,"COCA COLA":36.7,"CLARA 33 CL":26.1,"SANTES":4.2,"SANGRIA VI":5.3,"TURIA":17.9,"GESSAMI":2.9,"VIÑA POMAL":4.7,"PULPO":1.9,"RAMON LIMITED":2.3,"SYNERA NEGRE":11.4,"NESTEA":14.2}}}},"Picu StCugat":{"fam":{"order":["TAPES","MENU","BEGUDES","AMANIDES I VERDURETES","POSTRES","VINS I CAVES","COQUES","CAFES & INFUSIONS","PANS","XARRUPS","LICORS","ALTRES"],"eur":{"TAPES":[2868.0,5925.0,3436.5,4128.5,6040.2,4119.6,5089.6,5164.0,3986.1,3937.5,4626.1,5220.4,4181.2,3214.1,5206.8,5030.4],"MENU":[1395.5,3059.0,2009.8,2018.9,4354.6,2839.1,3319.5,3419.4,3605.5,3897.5,2290.4,2003.9,4631.7,1949.8,3155.3,1634.8],"BEGUDES":[817.8,1372.9,1026.2,992.2,1687.0,1191.3,1507.0,1471.9,1116.8,1096.8,1339.9,1400.6,1221.6,727.1,1624.5,1624.4],"AMANIDES I VERDURETES":[541.5,955.9,617.5,542.7,961.8,798.6,791.9,870.6,836.4,758.5,751.9,941.6,594.7,414.3,963.5,1049.8],"POSTRES":[452.0,852.6,497.0,602.6,990.4,578.2,576.4,668.6,581.0,635.4,775.5,900.7,654.9,455.7,628.8,723.0],"VINS I CAVES":[388.0,775.5,362.5,393.0,787.0,398.5,571.5,718.0,488.0,440.0,571.5,426.0,456.0,494.5,458.5,476.5],"COQUES":[202.2,578.6,327.6,234.8,562.2,239.6,493.8,436.8,425.4,346.7,412.4,386.2,396.0,249.2,461.4,375.0],"CAFES & INFUSIONS":[146.9,234.1,242.7,195.1,291.8,234.9,181.8,219.8,219.8,143.9,206.1,202.0,174.5,145.7,221.7,267.1],"PANS":[72.0,113.0,67.0,77.5,138.5,66.0,129.5,119.0,88.5,73.5,98.5,81.5,67.5,74.0,104.5,96.0],"XARRUPS":[7.0,55.0,6.0,24.5,22.0,13.0,12.0,9.0,39.5,38.0,21.5,12.0,15.0,6.0,21.5,18.5],"LICORS":[5.0,0.0,0.0,9.0,5.5,0.0,15.0,32.5,0.0,0.0,5.5,5.5,10.0,0.0,0.0,20.5],"ALTRES":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]},"uni":{"TAPES":[273,565,352,350,628,408,521,535,450,435,463,504,434,325,510,454],"MENU":[109,241,156,173,321,201,220,290,236,271,147,137,335,124,221,132],"BEGUDES":[275,492,360,363,643,451,540,549,447,478,473,495,534,274,594,528],"AMANIDES I VERDURETES":[65,114,94,65,118,111,109,99,103,102,91,113,91,60,111,122],"POSTRES":[115,210,123,153,256,170,185,181,203,213,165,202,221,130,193,159],"VINS I CAVES":[23,49,20,21,52,27,37,40,37,31,31,24,40,28,32,25],"COQUES":[21,63,43,30,79,40,63,57,65,53,56,59,59,31,52,45],"CAFES & INFUSIONS":[101,151,132,118,183,146,127,144,144,122,129,104,149,85,135,147],"PANS":[34,57,30,37,70,33,63,56,51,42,48,36,44,37,50,41],"XARRUPS":[2,25,4,10,12,4,8,6,15,12,11,9,5,2,13,8],"LICORS":[1,0,0,1,1,0,3,6,0,0,1,1,3,0,0,4],"ALTRES":[0,2,4,8,17,10,3,6,4,4,5,0,10,6,4,6]},"mitja_eur":{"TAPES":4510.9,"MENU":2849.0,"BEGUDES":1263.6,"AMANIDES I VERDURETES":774.5,"POSTRES":660.8,"VINS I CAVES":512.8,"COQUES":383.0,"CAFES & INFUSIONS":208.0,"PANS":91.7,"XARRUPS":20.0,"LICORS":6.8,"ALTRES":0.0},"mitja_uni":{"TAPES":450.4,"MENU":207.1,"BEGUDES":468.5,"AMANIDES I VERDURETES":98.0,"POSTRES":179.9,"VINS I CAVES":32.3,"COQUES":51.0,"CAFES & INFUSIONS":132.3,"PANS":45.6,"XARRUPS":9.1,"LICORS":1.3,"ALTRES":5.6}},"art":{"MENJAR":{"order":["MENU DIA","Menú 34","Menú 36","TACOS PASTOR","OUS CAMPEROLS ESTRELLATS","TXOCOS","FLOR DE CARXOFA","PATATES BRAVES","STEAK TARTAR","SECRET IBERIC","MENU 29","TIRES POLLASTRE","TARTAR DE SALMO","ENTRANYA DE VEDELLA A LA BRASA","BIKINI PICUTEIG","BURGER PICUTEIG","CROQUETES ROSTIT","BURRATA OBERTA","ENSALADILLA","ENTRECOT","COCA POLLASTRE ROSTIT","COCA BOTIFARRA","PROVOLONE FOS","CROQUETES DE PERNIL","HUMMUS","BOTI LLEIDA","COCA VERDURETES","AMANIDA  TOMAQUET VENTRESCA","LAMINES DE ROAST BEEF","MACARRONS L AVIA","SALMO  VERDURETES i SALSA MISO","CUIXA DE POLLASTRE DESOSSAT I ESPECIAT","PASTANAGUES ROSTIDES","PA TOMATA","AMANIDA CABRA","TÁRTAR DE TOMÁQUET ","ESQUEIXADA","MINICANELONS","AMANIDA CESAR","AÑADE CROQ. ROSTIT"],"eur":{"MENU DIA":[641.2,657.0,1501.4,458.0,1272.4,1364.0,1259.5,893.1,1374.0,1089.2,873.1,1328.2,1603.0,916.0,1089.2,938.9],"Menú 34":[0.0,952.0,136.0,816.0,646.0,612.0,816.0,680.0,816.0,1904.0,0.0,136.0,1768.0,272.0,0.0,136.0],"Menú 36":[216.0,936.0,0.0,288.0,936.0,432.0,540.0,1008.0,540.0,432.0,936.0,144.0,324.0,360.0,1656.0,0.0],"TACOS PASTOR":[207.0,448.5,414.0,379.5,379.5,690.0,483.0,345.0,379.5,345.0,345.0,517.5,345.0,414.0,621.0,414.0],"OUS CAMPEROLS ESTRELLATS":[222.4,472.6,319.7,430.9,514.3,222.4,444.8,472.6,208.5,347.5,375.3,458.7,417.0,194.6,403.1,375.3],"TXOCOS":[263.5,403.0,201.5,294.5,248.0,372.0,418.5,403.0,356.5,387.5,356.5,542.5,418.5,263.5,294.5,294.5],"FLOR DE CARXOFA":[235.2,403.2,252.0,193.2,415.6,285.6,319.2,378.0,352.8,310.8,336.0,378.0,268.8,159.6,327.6,378.0],"PATATES BRAVES":[220.8,386.4,241.5,255.3,358.8,317.4,434.7,414.0,262.2,227.7,324.3,386.4,303.6,227.7,324.3,296.7],"STEAK TARTAR":[183.0,424.0,204.5,273.0,243.5,140.0,455.0,402.5,214.0,210.0,204.5,389.0,204.5,305.5,262.5,305.5],"SECRET IBERIC":[205.5,341.0,193.0,318.5,489.0,137.5,193.0,359.5,172.5,96.5,320.5,343.0,176.5,224.0,333.0,372.0],"MENU 29":[348.0,116.0,0.0,116.0,957.0,0.0,348.0,174.0,580.0,174.0,174.0,0.0,609.0,232.0,0.0,232.0],"TIRES POLLASTRE":[116.1,361.2,154.8,206.4,348.3,141.9,232.2,141.9,219.3,335.4,167.7,309.6,270.9,180.6,309.6,335.4],"TARTAR DE SALMO":[183.5,185.5,144.0,183.5,249.5,220.5,274.0,268.0,296.5,185.5,319.5,274.0,208.0,107.0,400.0,266.0],"ENTRANYA DE VEDELLA A LA BRASA":[157.5,280.0,87.5,175.0,175.0,315.0,280.0,227.5,157.5,210.0,332.5,192.5,192.5,140.0,315.0,297.5],"BIKINI PICUTEIG":[102.3,269.7,186.0,130.2,241.8,186.0,102.3,186.0,195.3,139.5,195.3,288.3,232.5,130.2,279.0,120.9],"BURGER PICUTEIG":[69.6,367.7,97.4,304.1,192.8,165.0,272.3,222.6,83.5,127.2,210.7,117.3,159.0,67.6,129.2,240.5],"CROQUETES ROSTIT":[120.4,249.4,68.8,154.8,258.0,120.4,180.6,189.2,111.8,180.6,154.8,154.8,172.0,146.2,266.6,154.8],"BURRATA OBERTA":[125.1,125.1,125.1,180.7,168.8,240.3,125.1,152.9,250.2,180.7,111.2,222.4,85.4,41.7,236.3,198.6],"ENSALADILLA":[62.4,132.6,132.6,109.2,234.0,0.0,124.8,148.2,171.6,156.0,140.4,171.6,156.0,117.0,226.2,202.8],"ENTRECOT":[98.0,171.5,179.5,147.0,326.5,163.0,179.5,122.5,98.0,73.5,204.0,114.0,89.5,24.5,122.5,163.0],"COCA POLLASTRE ROSTIT":[57.0,193.8,159.6,57.0,216.6,79.8,182.4,182.4,148.2,91.2,125.4,193.8,182.4,148.2,136.8,114.0],"COCA BOTIFARRA":[57.0,228.0,79.8,79.8,228.0,91.2,193.8,136.8,159.6,136.8,159.6,114.0,125.4,91.2,148.2,114.0],"PROVOLONE FOS":[64.8,183.6,118.8,129.6,151.2,151.2,108.0,205.2,162.0,108.0,172.8,97.2,129.6,86.4,118.8,108.0],"CROQUETES DE PERNIL":[120.4,197.8,68.8,86.0,111.8,68.8,146.2,232.2,94.6,103.2,86.0,154.8,129.0,111.8,146.2,137.6],"HUMMUS":[84.6,169.2,75.2,103.4,208.8,122.2,159.8,122.2,159.8,150.4,75.2,47.0,159.8,84.6,94.0,131.6],"BOTI LLEIDA":[47.6,214.2,59.5,107.1,142.8,95.2,71.4,226.1,71.4,59.5,71.4,178.5,59.5,47.6,107.1,166.6],"COCA VERDURETES":[88.2,156.8,88.2,98.0,117.6,68.6,117.6,117.6,117.6,107.8,127.4,78.4,88.2,9.8,176.4,147.0],"AMANIDA  TOMAQUET VENTRESCA":[15.5,81.0,50.5,56.0,166.0,64.0,129.5,100.5,52.5,74.5,112.0,118.0,77.5,139.0,237.5,183.5],"LAMINES DE ROAST BEEF":[61.6,154.0,123.2,77.0,215.6,92.4,77.0,123.2,61.6,107.8,123.2,92.4,92.4,46.2,92.4,77.0],"MACARRONS L AVIA":[76.3,141.7,87.2,130.8,98.1,87.2,43.6,196.2,76.3,76.3,119.9,98.1,141.7,32.7,76.3,109.0],"SALMO  VERDURETES i SALSA MISO":[18.5,92.5,92.5,55.5,314.5,74.0,92.5,37.0,129.5,111.0,55.5,55.5,111.0,55.5,74.0,129.5],"CUIXA DE POLLASTRE DESOSSAT I ESPECIAT":[116.0,43.5,29.0,43.5,232.0,58.0,14.5,43.5,58.0,87.0,116.0,116.0,58.0,101.5,72.5,101.5],"PASTANAGUES ROSTIDES":[35.6,169.1,62.3,53.4,0.0,115.7,53.4,115.7,97.9,97.9,62.3,106.8,80.1,26.7,79.2,123.7],"PA TOMATA":[57.5,90.0,60.0,72.5,128.5,60.0,112.5,110.0,72.5,57.5,87.5,57.5,59.5,70.0,92.5,85.0],"AMANIDA CABRA":[94.4,118.0,107.2,11.8,129.8,23.6,82.6,70.8,35.4,70.8,59.0,70.8,47.2,35.4,47.2,70.8],"TÁRTAR DE TOMÁQUET ":[52.2,139.2,43.5,43.5,34.8,60.9,87.0,26.1,87.0,52.2,139.2,69.6,34.8,52.2,52.2,87.0],"ESQUEIXADA":[31.5,31.5,63.0,52.5,84.0,52.5,97.5,63.0,94.5,52.5,63.0,21.0,42.0,21.0,73.5,157.5],"MINICANELONS":[23.6,82.6,23.6,35.4,94.4,106.2,82.6,59.0,47.2,47.2,23.6,94.4,47.2,35.4,82.6,35.4],"AMANIDA CESAR":[35.7,59.5,11.9,47.6,47.6,83.3,47.6,35.7,47.6,23.8,71.4,59.5,35.7,11.9,35.7,95.2],"AÑADE CROQ. ROSTIT":[30.8,56.0,39.2,14.0,64.4,50.4,28.0,61.6,39.2,36.4,42.0,70.0,11.2,25.2,53.2,56.0]},"uni":{"MENU DIA":[28,30,66,20,56,60,55,39,60,48,39,59,70,40,49,41],"Menú 34":[0,28,4,24,19,18,24,20,24,56,0,4,52,8,0,4],"Menú 36":[6,26,0,8,26,12,15,28,15,12,26,4,9,10,46,0],"TACOS PASTOR":[6,13,12,11,12,20,14,11,11,10,10,15,10,12,18,12],"OUS CAMPEROLS ESTRELLATS":[21,37,28,38,60,21,41,40,24,34,31,37,46,20,36,36],"TXOCOS":[17,26,13,19,16,24,27,27,23,25,23,36,27,17,19,19],"FLOR DE CARXOFA":[28,51,30,26,54,36,40,45,42,37,40,45,32,19,41,45],"PATATES BRAVES":[32,60,35,38,60,48,70,64,42,43,52,58,49,36,47,43],"STEAK TARTAR":[14,31,14,21,23,10,30,25,15,12,16,23,16,22,24,19],"SECRET IBERIC":[12,29,14,24,35,13,17,35,15,7,30,26,16,14,24,21],"MENU 29":[12,4,0,4,33,0,12,6,20,6,6,0,21,8,0,8],"TIRES POLLASTRE":[11,28,12,16,28,15,19,16,22,29,16,30,23,14,30,34],"TARTAR DE SALMO":[12,19,14,12,28,21,26,20,28,23,26,22,22,13,37,17],"ENTRANYA DE VEDELLA A LA BRASA":[16,24,17,15,35,33,44,33,33,35,37,24,19,21,36,22],"BIKINI PICUTEIG":[11,31,20,14,26,20,13,23,23,23,24,32,27,17,30,13],"BURGER PICUTEIG":[7,24,8,23,14,14,18,14,7,8,17,10,10,6,10,16],"CROQUETES ROSTIT":[14,29,8,18,30,14,23,24,14,25,21,18,23,19,31,18],"BURRATA OBERTA":[12,15,12,15,20,24,13,18,22,16,15,17,9,7,28,16],"ENSALADILLA":[8,21,24,17,36,3,24,23,30,28,23,30,29,19,37,33],"ENTRECOT":[4,7,8,6,14,8,8,6,4,3,9,6,5,1,5,8],"COCA POLLASTRE ROSTIT":[5,20,17,9,36,13,26,21,28,23,18,28,24,20,16,13],"COCA BOTIFARRA":[5,20,7,8,20,9,18,13,15,12,15,10,12,8,13,10],"PROVOLONE FOS":[6,24,12,18,19,19,16,24,21,20,16,10,24,10,11,11],"CROQUETES DE PERNIL":[14,25,8,10,13,8,17,27,12,12,10,18,15,13,17,17],"HUMMUS":[10,20,9,11,32,16,24,13,25,25,12,6,23,14,12,14],"BOTI LLEIDA":[4,21,5,10,16,10,6,22,7,7,8,15,7,4,9,14],"COCA VERDURETES":[11,22,15,11,17,14,16,20,19,14,17,18,19,3,23,21],"AMANIDA  TOMAQUET VENTRESCA":[2,6,8,6,14,9,13,10,9,10,10,13,10,12,22,18],"LAMINES DE ROAST BEEF":[8,14,11,6,22,13,14,16,16,17,12,11,12,6,12,10],"MACARRONS L AVIA":[12,17,16,14,13,14,8,22,8,18,12,14,19,7,8,12],"SALMO  VERDURETES i SALSA MISO":[2,5,5,3,18,4,5,4,7,8,5,4,7,3,7,7],"CUIXA DE POLLASTRE DESOSSAT I ESPECIAT":[9,8,15,4,16,11,3,4,6,8,11,14,13,12,13,11],"PASTANAGUES ROSTIDES":[6,31,10,16,4,24,18,19,18,30,12,16,27,14,10,19],"PA TOMATA":[26,50,28,38,73,32,55,54,44,36,43,25,41,35,47,38],"AMANIDA CABRA":[11,15,20,5,20,11,14,8,12,11,8,13,13,8,14,16],"TÁRTAR DE TOMÁQUET ":[6,17,5,6,4,7,10,3,10,6,16,8,4,6,6,10],"ESQUEIXADA":[8,5,15,6,15,10,13,12,18,6,10,6,13,6,16,17],"MINICANELONS":[7,9,4,5,11,14,12,6,7,13,3,11,9,5,8,4],"AMANIDA CESAR":[6,7,11,4,9,12,9,6,5,5,10,9,11,2,6,8],"AÑADE CROQ. ROSTIT":[11,20,14,5,23,18,11,26,15,13,19,25,5,9,19,20]},"mitja_eur":{"MENU DIA":1078.6,"Menú 34":605.6,"Menú 36":546.8,"TACOS PASTOR":420.5,"OUS CAMPEROLS ESTRELLATS":367.5,"TXOCOS":344.9,"FLOR DE CARXOFA":312.1,"PATATES BRAVES":311.4,"STEAK TARTAR":276.3,"SECRET IBERIC":267.2,"MENU 29":253.8,"TIRES POLLASTRE":239.5,"TARTAR DE SALMO":235.3,"ENTRANYA DE VEDELLA A LA BRASA":220.9,"BIKINI PICUTEIG":186.6,"BURGER PICUTEIG":176.7,"CROQUETES ROSTIT":167.7,"BURRATA OBERTA":160.6,"ENSALADILLA":142.8,"ENTRECOT":142.3,"COCA POLLASTRE ROSTIT":141.8,"COCA BOTIFARRA":133.9,"PROVOLONE FOS":131.0,"CROQUETES DE PERNIL":124.7,"HUMMUS":121.7,"BOTI LLEIDA":107.8,"COCA VERDURETES":106.6,"AMANIDA  TOMAQUET VENTRESCA":103.6,"LAMINES DE ROAST BEEF":101.1,"MACARRONS L AVIA":99.5,"SALMO  VERDURETES i SALSA MISO":93.7,"CUIXA DE POLLASTRE DESOSSAT I ESPECIAT":80.7,"PASTANAGUES ROSTIDES":80.0,"PA TOMATA":79.6,"AMANIDA CABRA":67.2,"TÁRTAR DE TOMÁQUET ":66.3,"ESQUEIXADA":62.5,"MINICANELONS":57.5,"AMANIDA CESAR":46.9,"AÑADE CROQ. ROSTIT":42.4},"mitja_uni":{"MENU DIA":47.5,"Menú 34":17.8,"Menú 36":15.2,"TACOS PASTOR":12.3,"OUS CAMPEROLS ESTRELLATS":34.4,"TXOCOS":22.4,"FLOR DE CARXOFA":38.2,"PATATES BRAVES":48.6,"STEAK TARTAR":19.7,"SECRET IBERIC":20.8,"MENU 29":8.8,"TIRES POLLASTRE":21.4,"TARTAR DE SALMO":21.2,"ENTRANYA DE VEDELLA A LA BRASA":27.8,"BIKINI PICUTEIG":21.7,"BURGER PICUTEIG":12.9,"CROQUETES ROSTIT":20.6,"BURRATA OBERTA":16.2,"ENSALADILLA":24.1,"ENTRECOT":6.4,"COCA POLLASTRE ROSTIT":19.8,"COCA BOTIFARRA":12.2,"PROVOLONE FOS":16.3,"CROQUETES DE PERNIL":14.8,"HUMMUS":16.6,"BOTI LLEIDA":10.3,"COCA VERDURETES":16.2,"AMANIDA  TOMAQUET VENTRESCA":10.8,"LAMINES DE ROAST BEEF":12.5,"MACARRONS L AVIA":13.4,"SALMO  VERDURETES i SALSA MISO":5.9,"CUIXA DE POLLASTRE DESOSSAT I ESPECIAT":9.9,"PASTANAGUES ROSTIDES":17.1,"PA TOMATA":41.6,"AMANIDA CABRA":12.4,"TÁRTAR DE TOMÁQUET ":7.8,"ESQUEIXADA":11.0,"MINICANELONS":8.0,"AMANIDA CESAR":7.5,"AÑADE CROQ. ROSTIT":15.8}},"POSTRES":{"order":["COULANT XOCOLATA","CHEESECAKE","TIRAMISU","BROWNIE","CHEESECAKE FESTUC","SOPETA DE MARACUYÀ","FLAN D'OU","CARPACCIO PINYA"],"eur":{"COULANT XOCOLATA":[87.0,117.0,87.0,139.2,191.4,116.0,69.6,104.4,127.6,157.6,197.2,150.8,69.6,81.2,98.6,139.2],"CHEESECAKE":[69.6,46.4,133.4,92.8,98.6,121.8,58.0,92.8,127.6,116.0,150.8,133.4,58.0,69.6,133.4,104.4],"TIRAMISU":[29.0,110.2,34.8,40.6,98.6,52.2,46.4,92.8,87.0,98.6,87.0,116.0,75.4,34.8,34.8,63.8],"BROWNIE":[40.6,81.2,75.4,87.0,92.8,46.4,58.0,69.6,63.8,75.4,98.6,81.2,63.8,29.0,58.0,34.8],"CHEESECAKE FESTUC":[55.3,173.8,0.0,0.0,86.9,63.2,15.8,0.0,0.0,0.0,63.2,71.1,86.9,0.0,0.0,55.3],"SOPETA DE MARACUYÀ":[27.5,38.5,22.0,22.0,49.5,33.0,44.0,55.0,38.5,60.5,27.5,55.0,33.0,11.0,66.0,38.5],"FLAN D'OU":[0.0,53.9,39.2,29.4,58.8,24.5,19.6,44.1,39.2,39.2,34.3,53.9,34.3,39.2,4.9,29.4],"CARPACCIO PINYA":[19.6,19.6,24.5,24.5,39.2,29.4,49.0,34.3,14.7,24.5,29.4,58.8,34.3,24.5,49.0,68.6]},"uni":{"COULANT XOCOLATA":[22,38,20,36,54,26,30,30,43,51,40,32,33,21,32,30],"CHEESECAKE":[18,20,31,27,42,32,30,28,39,34,34,24,30,13,33,21],"TIRAMISU":[7,19,6,7,17,10,9,16,17,17,15,20,14,6,6,11],"BROWNIE":[12,17,18,17,17,21,17,12,21,23,19,25,14,13,15,7],"CHEESECAKE FESTUC":[7,22,0,0,11,8,2,0,0,0,8,9,12,0,0,7],"SOPETA DE MARACUYÀ":[6,13,6,9,26,11,21,19,15,24,7,15,16,11,18,10],"FLAN D'OU":[6,18,12,12,18,12,6,10,13,17,10,16,19,14,11,8],"CARPACCIO PINYA":[6,14,8,8,18,17,21,18,12,12,9,16,16,13,22,23]},"mitja_eur":{"COULANT XOCOLATA":120.8,"CHEESECAKE":100.4,"TIRAMISU":68.9,"BROWNIE":66.0,"CHEESECAKE FESTUC":42.0,"SOPETA DE MARACUYÀ":38.8,"FLAN D'OU":34.0,"CARPACCIO PINYA":34.0},"mitja_uni":{"COULANT XOCOLATA":33.6,"CHEESECAKE":28.5,"TIRAMISU":12.3,"BROWNIE":16.8,"CHEESECAKE FESTUC":5.4,"SOPETA DE MARACUYÀ":14.2,"FLAN D'OU":12.6,"CARPACCIO PINYA":14.6}},"BEGUDES":{"order":["COPA 33 CL","AGUA NATURAL","AGUA","TURIA","COCA COLA ZERO","TALLAT","DAMM LEMON","LA CAMIONETA","SANTES","CAFE","C. BLANC CAMIONETA","VICHY","GESSAMI","COCA COLA","FREE DAMM TORRADA","PAGO CAPELLANES","VIÑA POMAL CRIANÇA","COPA BLANC SINERA","copa viña pomal","SYNERA BLANC"],"eur":{"COPA 33 CL":[105.0,161.0,196.0,126.0,332.5,220.5,140.0,294.0,196.0,143.5,217.0,171.5,199.5,84.0,318.5,234.5],"AGUA NATURAL":[98.0,210.0,120.4,134.4,238.0,182.0,128.8,246.4,140.0,173.6,173.6,218.4,114.8,78.4,126.0,187.6],"AGUA":[86.8,168.0,98.0,117.6,103.6,100.8,168.0,112.0,84.0,142.8,109.2,162.4,140.0,100.8,176.4,165.2],"TURIA":[108.0,129.6,50.4,72.0,118.8,100.8,306.0,118.8,79.2,133.2,104.4,115.2,97.2,72.0,162.0,144.0],"COCA COLA ZERO":[24.5,73.5,59.5,84.0,66.5,35.0,73.5,52.5,70.0,42.0,66.5,105.0,77.0,59.5,84.0,105.0],"TALLAT":[50.0,54.0,68.0,54.0,98.0,88.0,50.0,44.0,46.0,48.0,52.0,56.0,58.0,46.0,56.0,72.0],"DAMM LEMON":[16.0,35.2,19.2,64.0,57.6,70.4,44.8,57.6,76.8,44.8,128.0,48.0,54.4,35.2,44.8,108.8],"LA CAMIONETA":[18.5,55.5,18.5,18.5,148.0,92.5,10.0,92.5,55.5,92.5,55.5,55.5,0.0,119.0,22.5,37.0],"SANTES":[39.0,97.5,19.5,58.5,58.5,58.5,97.5,58.5,19.5,19.5,19.5,78.0,39.0,19.5,78.0,78.0],"CAFE":[55.8,77.4,52.2,45.0,59.4,52.2,46.8,48.6,61.2,41.4,32.4,36.0,41.4,34.2,73.8,64.8],"C. BLANC CAMIONETA":[19.0,45.6,76.0,30.4,83.6,34.2,53.2,64.6,42.0,45.6,41.8,34.2,41.8,26.6,79.8,64.6],"VICHY":[39.0,45.0,42.0,24.0,57.0,48.0,33.0,39.0,66.0,39.0,54.0,42.0,45.0,27.0,87.0,75.0],"GESSAMI":[22.0,49.0,66.0,0.0,27.0,44.0,137.0,5.0,0.0,93.0,44.0,22.0,66.0,44.0,0.0,110.0],"COCA COLA":[31.5,56.0,45.5,38.5,66.5,17.5,21.0,28.0,45.5,14.0,28.0,31.5,59.5,31.5,66.5,24.5],"FREE DAMM TORRADA":[14.4,50.4,36.0,31.9,39.6,28.3,25.2,61.2,32.4,32.4,54.0,21.6,39.6,32.4,28.8,32.4],"PAGO CAPELLANES":[65.0,97.5,10.0,0.0,0.0,32.5,65.0,65.0,20.0,32.5,97.5,32.5,32.5,0.0,0.0,0.0],"VIÑA POMAL CRIANÇA":[16.0,64.5,29.5,12.0,43.0,0.0,16.0,47.0,25.5,33.5,4.0,55.0,51.0,12.0,47.0,90.0],"COPA BLANC SINERA":[45.5,17.5,31.5,17.5,42.0,3.5,35.0,45.5,14.0,45.5,42.0,24.5,52.5,21.0,10.5,31.5],"copa viña pomal":[9.0,40.5,27.0,18.0,36.0,22.5,49.5,58.5,9.0,4.5,9.0,58.5,31.5,18.0,40.5,45.0],"SYNERA BLANC":[34.0,85.0,0.0,34.0,17.0,17.0,34.0,0.0,0.0,17.0,68.0,34.0,34.0,0.0,51.0,17.0]},"uni":{"COPA 33 CL":[35,58,74,62,114,69,55,99,64,62,78,56,92,30,112,75],"AGUA NATURAL":[38,92,53,56,105,71,70,102,63,80,70,87,69,38,48,70],"AGUA":[39,68,40,49,59,64,82,57,58,74,50,81,78,44,95,70],"TURIA":[33,47,15,29,45,40,94,53,37,54,37,38,45,24,59,42],"COCA COLA ZERO":[7,23,20,27,25,19,29,20,31,24,24,39,31,20,31,38],"TALLAT":[29,35,34,27,61,48,37,28,28,26,29,30,40,23,30,39],"DAMM LEMON":[5,18,8,22,21,24,20,28,29,18,43,16,18,17,20,35],"LA CAMIONETA":[1,3,1,1,8,5,2,5,3,5,3,3,0,8,2,2],"SANTES":[2,5,1,3,3,4,5,3,1,1,1,4,2,1,4,4],"CAFE":[39,56,36,34,40,31,31,38,39,37,24,21,44,28,45,41],"C. BLANC CAMIONETA":[6,17,22,9,25,9,15,17,12,18,11,11,14,9,25,18],"VICHY":[13,16,18,11,30,24,14,17,29,16,19,18,27,12,34,28],"GESSAMI":[1,3,3,0,2,2,7,1,0,5,2,1,3,2,0,5],"COCA COLA":[10,19,16,16,35,8,11,12,17,12,12,14,23,10,22,11],"FREE DAMM TORRADA":[6,18,10,11,17,11,10,20,12,16,17,10,14,11,12,14],"PAGO CAPELLANES":[2,3,1,0,0,1,2,2,2,1,3,1,1,0,0,0],"VIÑA POMAL CRIANÇA":[3,3,3,3,3,0,4,3,2,4,1,5,4,3,3,5],"COPA BLANC SINERA":[13,10,10,5,13,3,10,17,6,19,13,7,22,7,3,9],"copa viña pomal":[2,9,6,4,8,5,11,13,2,1,4,13,7,5,9,10],"SYNERA BLANC":[3,10,0,2,3,4,2,2,5,4,5,2,5,0,6,1]},"mitja_eur":{"COPA 33 CL":196.2,"AGUA NATURAL":160.7,"AGUA":127.2,"TURIA":119.5,"COCA COLA ZERO":67.4,"TALLAT":58.8,"DAMM LEMON":56.6,"LA CAMIONETA":55.7,"SANTES":52.4,"CAFE":51.4,"C. BLANC CAMIONETA":48.9,"VICHY":47.6,"GESSAMI":45.6,"COCA COLA":37.8,"FREE DAMM TORRADA":35.0,"PAGO CAPELLANES":34.4,"VIÑA POMAL CRIANÇA":34.1,"COPA BLANC SINERA":30.0,"copa viña pomal":29.8,"SYNERA BLANC":27.6},"mitja_uni":{"COPA 33 CL":70.9,"AGUA NATURAL":69.5,"AGUA":63.0,"TURIA":43.2,"COCA COLA ZERO":25.5,"TALLAT":34.0,"DAMM LEMON":21.4,"LA CAMIONETA":3.2,"SANTES":2.8,"CAFE":36.5,"C. BLANC CAMIONETA":14.9,"VICHY":20.4,"GESSAMI":2.3,"COCA COLA":15.5,"FREE DAMM TORRADA":13.1,"PAGO CAPELLANES":1.2,"VIÑA POMAL CRIANÇA":3.1,"COPA BLANC SINERA":10.4,"copa viña pomal":6.8,"SYNERA BLANC":3.4}}}}}};
+const PD={"weeks":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16],"wk":{"SM Sarrià":[15196,18772,18063,15809,20929,18377,19535,20214,20713,18520,21323,22055,23131,21233,23354,25097],"SM Sabadell":[26815,19681,12981,16017,17976,16665,16920,18557,18099,15348,15818,16786,18062,21985,16733,16865],"Picu Sabadell":[24330,18978,13051,7339,16274,15332,15374,17872,17272,16486,13767,16916,16798,19781,16296,16993],"Picu StCugat":[6270,12660,7814,8388,14406,9530,11542,11944,10359,10341,10095,10530,11277,7028,11679,10289],"TOTAL":[72611,70091,51909,47553,69585,59904,63371,68587,66443,60695,61003,66287,69268,70027,68062,69244]},"reg":{"SM Sarrià":{"sl":484,"r2":0.747,"tend":[16517,17001,17485,17968,18452,18936,19420,19903,20387,20871,21354,21838,22322,22805,23289,23773]},"SM Sabadell":{"sl":-129,"r2":0.039,"tend":[18801,18672,18542,18413,18284,18155,18026,17896,17767,17638,17509,17380,17250,17121,16992,16863]},"Picu Sabadell":{"sl":20,"r2":0.001,"tend":[16278,16298,16318,16338,16358,16379,16399,16419,16439,16459,16479,16499,16519,16539,16559,16579]},"Picu StCugat":{"sl":52,"r2":0.014,"tend":[9869,9921,9973,10025,10077,10129,10181,10233,10286,10338,10390,10442,10494,10546,10598,10650]},"TOTAL":{"sl":427,"r2":0.085,"tend":[61466,61892,62319,62745,63172,63598,64025,64452,64878,65305,65732,66158,66585,67011,67438,67864]}},"top_menjar":[{"art":"MENU DIA","sar":0,"sbd":0,"psb":64132,"psc":17258,"tot":81390},{"art":"PATATES BRAVES","sar":0,"sbd":15538,"psb":7466,"psc":4982,"tot":27985},{"art":"STEAK TARTAR","sar":7774,"sbd":4360,"psb":5354,"psc":4421,"tot":21909},{"art":" COCA BUTIFARRA","sar":0,"sbd":18628,"psb":0,"psc":0,"tot":18628},{"art":"COCA PERNIL IBÈRIC","sar":0,"sbd":18626,"psb":0,"psc":0,"tot":18626},{"art":"SECRET IBERIC","sar":5365,"sbd":0,"psb":6532,"psc":4275,"tot":16172},{"art":"TXOCOS","sar":0,"sbd":0,"psb":10648,"psc":5518,"tot":16166},{"art":"OUS CAMPEROLS ESTRELLATS","sar":7703,"sbd":0,"psb":0,"psc":5880,"tot":13583},{"art":"PATATAS BRAVAS","sar":13062,"sbd":0,"psb":0,"psc":0,"tot":13062},{"art":"FLOR DE CARXOFA","sar":6845,"sbd":0,"psb":0,"psc":4994,"tot":11838},{"art":"BIKINI TRUFAT","sar":6374,"sbd":5419,"psb":0,"psc":9,"tot":11802},{"art":"OUS PERNIL","sar":0,"sbd":0,"psb":11541,"psc":0,"tot":11541},{"art":"HAMB. AMERICANA","sar":0,"sbd":11448,"psb":0,"psc":0,"tot":11448},{"art":"TIRES POLLASTRE","sar":0,"sbd":0,"psb":7149,"psc":3831,"tot":10980},{"art":"TIRES DE POLLASTRE","sar":0,"sbd":10191,"psb":0,"psc":0,"tot":10191},{"art":"GUACAMOLE AMB NACHOS","sar":0,"sbd":9951,"psb":0,"psc":0,"tot":9951},{"art":"COCA SOBRASSADA","sar":0,"sbd":9875,"psb":0,"psc":0,"tot":9875},{"art":"G-MENU PICAPLAT 4 PAX","sar":0,"sbd":0,"psb":9756,"psc":0,"tot":9756},{"art":"Menú 34","sar":0,"sbd":0,"psb":0,"psc":9690,"tot":9690},{"art":"COCA DE CARBASSÓ","sar":0,"sbd":9475,"psb":0,"psc":0,"tot":9475},{"art":"B. LA DOBLE SMASH","sar":9194,"sbd":0,"psb":0,"psc":0,"tot":9194},{"art":"TARTAR DE SALMO","sar":0,"sbd":0,"psb":5426,"psc":3765,"tot":9190},{"art":"B. AMERICANA","sar":9111,"sbd":0,"psb":0,"psc":0,"tot":9111},{"art":"TIRES DE POLLO","sar":8978,"sbd":0,"psb":0,"psc":0,"tot":8978},{"art":"Menú 36","sar":0,"sbd":0,"psb":0,"psc":8748,"tot":8748},{"art":"COCA VERDURETES","sar":3255,"sbd":0,"psb":3557,"psc":1705,"tot":8518},{"art":"G-MENU PICUTEIG 4PAX","sar":0,"sbd":0,"psb":8091,"psc":0,"tot":8091},{"art":"GUACAMOLE NACHOS","sar":7992,"sbd":0,"psb":0,"psc":0,"tot":7992},{"art":"COCA POLLASTRE","sar":0,"sbd":0,"psb":7877,"psc":0,"tot":7877},{"art":"QUESADILLES ","sar":0,"sbd":7583,"psb":0,"psc":0,"tot":7583},{"art":"HUMMUS","sar":0,"sbd":3135,"psb":1955,"psc":1948,"tot":7038},{"art":"COCA BOTIFARRA","sar":0,"sbd":0,"psb":4834,"psc":2143,"tot":6977},{"art":"AMANIDA CABRA","sar":3596,"sbd":0,"psb":2254,"psc":1075,"tot":6925},{"art":"TACOS PASTOR","sar":0,"sbd":0,"psb":0,"psc":6728,"tot":6728},{"art":"SALMO PLANXA","sar":5198,"sbd":0,"psb":1336,"psc":0,"tot":6534},{"art":"CROQUETES PERNIL IBERIC","sar":6407,"sbd":0,"psb":0,"psc":0,"tot":6407},{"art":"BURRATA OBERTA","sar":0,"sbd":0,"psb":3836,"psc":2570,"tot":6406},{"art":"CROQUETES ROSTIT","sar":0,"sbd":0,"psb":3707,"psc":2683,"tot":6390},{"art":"COCA IBERIC BRIE","sar":6269,"sbd":0,"psb":0,"psc":0,"tot":6269},{"art":"COCA 4 QUESOS","sar":0,"sbd":6207,"psb":0,"psc":0,"tot":6207}],"top_postres":[{"art":"CHEESECAKE","sar":2892,"sbd":3291,"psb":2634,"psc":1607,"tot":10424},{"art":"TIRAMISU","sar":2308,"sbd":0,"psb":1958,"psc":1102,"tot":5368},{"art":"COULANT XOCOLATA","sar":0,"sbd":0,"psb":3238,"psc":1933,"tot":5171},{"art":"BROWNIE","sar":0,"sbd":2542,"psb":1299,"psc":1056,"tot":4896},{"art":"TORRIJA BRIOCHE ","sar":0,"sbd":3794,"psb":0,"psc":0,"tot":3794},{"art":"COULANT","sar":0,"sbd":3757,"psb":0,"psc":0,"tot":3757},{"art":"TIRAMISÚ","sar":0,"sbd":3264,"psb":0,"psc":0,"tot":3264},{"art":"CARDINALE","sar":1622,"sbd":1463,"psb":0,"psc":0,"tot":3084}],"top_begudes":[{"art":"BARRIL 33 CL","sar":17894,"sbd":7318,"psb":0,"psc":0,"tot":25212},{"art":"AGUA 50cl","sar":11127,"sbd":0,"psb":0,"psc":0,"tot":11127},{"art":"COCA COLA ZERO","sar":4974,"sbd":3045,"psb":1682,"psc":1078,"tot":10779},{"art":"AIGUA 50CL","sar":0,"sbd":10678,"psb":0,"psc":0,"tot":10678},{"art":"TALLAT","sar":3648,"sbd":2266,"psb":1694,"psc":940,"tot":8549},{"art":"AGUA","sar":0,"sbd":0,"psb":6107,"psc":2036,"tot":8142},{"art":"CLARA 33 CL","sar":4410,"sbd":2380,"psb":1184,"psc":0,"tot":7974},{"art":"COCA COLA 35CL","sar":3238,"sbd":2530,"psb":0,"psc":0,"tot":5768},{"art":"CAFE AMB LLET","sar":4885,"sbd":264,"psb":229,"psc":294,"tot":5672},{"art":"VICHY 33 CL","sar":4202,"sbd":1398,"psb":0,"psc":0,"tot":5600},{"art":"COPA CAMIONETA","sar":3736,"sbd":1832,"psb":0,"psc":0,"tot":5568},{"art":"LA CAMIONETA","sar":1150,"sbd":1529,"psb":1750,"psc":892,"tot":5320},{"art":"CANYA 33 CL","sar":0,"sbd":0,"psb":5275,"psc":0,"tot":5275},{"art":"BARRIL. TURIA","sar":4957,"sbd":0,"psb":0,"psc":0,"tot":4957},{"art":"CAFE SOL","sar":2530,"sbd":1710,"psb":0,"psc":0,"tot":4240},{"art":"SANTES","sar":1010,"sbd":1025,"psb":1180,"psc":838,"tot":4054},{"art":"COPA 33 CL","sar":0,"sbd":0,"psb":0,"psc":3140,"tot":3140},{"art":"TURIA 33CL","sar":0,"sbd":3110,"psb":0,"psc":0,"tot":3110},{"art":"TURIA","sar":0,"sbd":0,"psb":918,"psc":1912,"tot":2830},{"art":"COPA SANTES","sar":1582,"sbd":826,"psb":0,"psc":388,"tot":2796}],"fam_comp":[{"fam":"TAPES","sar":7339,"sbd":5444,"psb":5901,"psc":4511},{"fam":"MENU","sar":813,"sbd":139,"psb":6379,"psc":2849},{"fam":"BEGUDES","sar":3982,"sbd":2352,"psb":1548,"psc":1264},{"fam":"COQUES","sar":2233,"sbd":3926,"psb":1022,"psc":383},{"fam":"BURGERS","sar":2212,"sbd":2101,"psb":0,"psc":0},{"fam":"POSTRES","sar":959,"sbd":1488,"psb":916,"psc":661},{"fam":"VINS I CAVES","sar":1382,"sbd":1166,"psb":801,"psc":513},{"fam":"AMANIDES I VERDURETES","sar":881,"sbd":640,"psb":1009,"psc":774},{"fam":"CAFES & INFUSIONS","sar":980,"sbd":335,"psb":302,"psc":208},{"fam":"PLATILLOS","sar":0,"sbd":1448,"psb":0,"psc":0},{"fam":"APERITIUS","sar":690,"sbd":168,"psb":0,"psc":0},{"fam":"LICORS","sar":302,"sbd":30,"psb":25,"psc":7},{"fam":"ENTREPANS","sar":265,"sbd":0,"psb":0,"psc":0},{"fam":"FLAUTES","sar":0,"sbd":248,"psb":0,"psc":0},{"fam":"PANS","sar":0,"sbd":0,"psb":130,"psc":92}],"cov":{"sar_MENJAR":91.1,"sar_POSTRES":87.4,"sar_BEGUDES":73.3,"sar_FAM":100.0,"sbd_MENJAR":98.1,"sbd_POSTRES":89.9,"sbd_BEGUDES":75.4,"sbd_FAM":100.0,"psb_MENJAR":98.7,"psb_POSTRES":86.7,"psb_BEGUDES":74.4,"psb_FAM":100.0,"psc_MENJAR":96.5,"psc_POSTRES":76.4,"psc_BEGUDES":65.5,"psc_FAM":100.0}};
+const CTX={"28/03":"🌤️ Dissabte de Setmana Santa","15/03":"🌤️ Diumenge · bon temps","13/03":"🌦️ Divendres · setmana forta","21/03":"☀️ Primer dia de primavera","10/04":"🌤️ Divendres Sant · pont festiu","02/01":"❄️ Post-Nadal · tancament","19/01":"🌧️ Gener profund","02/02":"❄️ Lunes Candelera","07/01":"❄️ Dimecres post-Reis","16/03":"🌧️ Dilluns post-cap de setmana","11/04":"🌤️ Dissabte Sant · pic Setmana Santa","18/04":"🌤️ Dissabte · inici millor setmana","19/04":"🌤️ Diumenge de Resurrecció","17/04":"🌤️ Divendres inici pont","14/02":"💝 Sant Valentí","07/02":"⚽ Clàssic FCB","28/02":"🎭 Carnestoltes Sabadell","07/03":"🎪 Fira de Sabadell","24/01":"🌧️ Dissabte reactivació","31/01":"🌧️ Dissabte tancament gener","30/12":"🎄 Dimarts pre-Cap d'Any","31/12":"🎆 Cap d'Any","04/01":"☀️ Diumenge Nadal","05/01":"✨ Dilluns Reis","08/03":"💜 Dia Dona","22/02":"☁️ Diumenge febrer","08/02":"🎉 Diumenge post-Clàssic","29/03":"🌦️ Diumenge Rams","05/04":"🌤️ Diumenge Rams","04/04":"🌤️ Dissabte abril","01/03":"🌤️ Primer diumenge març"};
+const GRUP_V=[72611,70091,51909,47553,69585,59904,63371,68587,66443,60695,61003,66287,69268,70027,68062,69244];
+const GRUP_C=[24908,26626,23959,19798,25340,25692,26888,27625,26877,28176,27847,24729,26165,27044,26485,26787];
+const GRUP_RATIO=[34.3,38.0,46.2,41.6,36.4,42.9,42.4,40.3,40.5,46.4,45.6,37.3,37.8,38.6,38.9,38.7];
+const GRUP_ACUM=[34.3,36.1,38.8,39.3,38.7,39.4,39.8,39.9,39.9,40.6,41.0,40.7,40.4,40.3,40.2,40.1];
+
+const LOCS=['SM Sarrià','SM Sabadell','Picu Sabadell','Picu StCugat'];
+const LOCS_ALL=['TOTAL','SM Sarrià','SM Sabadell','Picu Sabadell','Picu StCugat'];
+const DIES=['Dl','Dt','Dc','Dj','Dv','Ds','Dg'];
+const TORNS_V=['Matí','Migdia','Tarda','Nit'];
+const GCOLS=['#1F3864','#1E6B3C','#E07B30','#9B6BD4'];
+const GCOLS_ALL=['#555555','#1F3864','#1E6B3C','#E07B30','#9B6BD4'];
+const COSTE_HORA = 19.0;
+let curLoc='TOTAL',curPer='SM Sarrià',charts={};
+
+const sf=r=>r<=35?'ok':r<=38?'warn':'bad';
+const si=r=>r<=35?'🟢':r<=38?'🟡':'🔴';
+const rc=r=>r<=35?'var(--ok)':r<=38?'var(--warn)':'var(--bad)';
+const rcbg=r=>r<=35?'rgba(52,199,89,.12)':r<=38?'rgba(255,159,10,.12)':'rgba(255,59,48,.12)';
+const fmt=n=>Math.round(n).toLocaleString('ca-ES');
+const pc=n=>parseFloat(n).toFixed(1)+'%';
+const dk=k=>{if(charts[k]){charts[k].destroy();delete charts[k]}};
+
+function showPage(p){
+  if(!SESSION) return;
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  const pageEl=document.getElementById('page-'+p);
+  const tabEl=document.getElementById('tab-'+p);
+  if(pageEl) pageEl.classList.add('active');
+  if(tabEl) tabEl.classList.add('active');
+  if(SESSION.local){ curLoc=SESSION.local; curPer=SESSION.local; }
+  if(p==='resum')renderResum();
+  if(p==='locals'){
+    buildSeg('loc-seg',curLoc,selLocal);
+    if(SESSION.local) document.getElementById('loc-seg').style.display='none';
+    renderLocDetail();
+  }
+  if(p==='personal'){
+    if(!SESSION.local && curPer!=='TOTAL' && !LOCS.includes(curPer)) curPer='TOTAL';
+    buildSeg('per-seg',curPer,selPer);
+    if(SESSION.local) document.getElementById('per-seg').style.display='none';
+    renderPerDetail();
+  }
+  if(p==='productes'){
+    curProdSec='articles';
+    renderProductes();
+  }
+  window.scrollTo(0,0);
+}
+
+function buildSeg(id,cur,fn){
+  const esLocal=fn===selLocal, esPer=fn===selPer;
+  let llista;
+  if(SESSION&&SESSION.local){
+    llista=[SESSION.local];
+  } else if(esLocal){
+    llista=LOCS_ALL;
+  } else if(esPer){
+    llista=['TOTAL',...LOCS];
+  } else {
+    llista=LOCS;
+  }
+  const colMap={'TOTAL':'#555','SM Sarrià':'#1F3864','SM Sabadell':'#1E6B3C','Picu Sabadell':'#E07B30','Picu StCugat':'#9B6BD4'};
+  document.getElementById(id).innerHTML=llista.map(l=>{
+    const label=l==='TOTAL'?'Grup':l.replace('SM Sarrià','S.Sarrià').replace('SM Sabadell','S.Sbd').replace('Picu Sabadell','P.Sbd').replace('Picu StCugat','P.StC');
+    return`<button class="sb${l===cur?' active':''}" onclick="${fn.name}('${l}')">${label}</button>`;
+  }).join('');
+}
+function selLocal(l){curLoc=l;buildSeg('loc-seg',l,selLocal);renderLocDetail();window.scrollTo(0,52);}
+function selPer(l){curPer=l;buildSeg('per-seg',l,selPer);renderPerDetail();window.scrollTo(0,52);}
+
+function renderResum(){
+  const totV=Object.values(DV).reduce((s,d)=>s+d.total_vendes,0);
+  const totC=Object.values(DV).reduce((s,d)=>s+d.total_cost,0);
+  const totR=totC/totV*100;
+  let html=`<table class="dtbl" style="font-size:11px">
+    <thead><tr>
+      <th style="text-align:left">Local</th>
+      <th>Vendes netes</th><th>Personal</th><th>Ràtio P/V</th><th>Dies</th>
+    </tr></thead><tbody>`;
+  LOCS.forEach((l,i)=>{
+    const d=DV[l];
+    html+=`<tr style="cursor:pointer" onclick="selLocal('${l}');showPage('locals')">
+      <td><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${GCOLS[i]};margin-right:4px"></span>${l}</td>
+      <td style="font-weight:600">${fmt(d.total_vendes)}€</td>
+      <td>${fmt(d.total_cost)}€</td>
+      <td style="font-weight:700;color:${rc(d.ratio)}">${pc(d.ratio)} ${si(d.ratio)}</td>
+      <td style="color:var(--sub)">${d.dies}</td>
+    </tr>`;
+  });
+  html+=`<tr style="border-top:.5px solid var(--sep);background:rgba(0,0,0,0.02)">
+    <td style="font-weight:700">TOTAL</td>
+    <td style="font-weight:700">${fmt(totV)}€</td>
+    <td style="font-weight:700">${fmt(totC)}€</td>
+    <td style="font-weight:700;color:${rc(totR)}">${pc(totR)} ${si(totR)}</td>
+    <td style="color:var(--sub)">—</td>
+  </tr></tbody></table>`;
+  document.getElementById('resum-taula').innerHTML=html;
+
+  const fws=DV['SM Sarrià'].fw_list.map(f=>'fw'+f);
+  const mitjes=LOCS.reduce((o,l)=>{const fw=DV[l].fw_vendes;o[l]=fw.reduce((a,b)=>a+b,0)/fw.length;return o},{});
+
+  dk('cg');
+  charts['cg']=new Chart(document.getElementById('cg').getContext('2d'),{
+    type:'line',
+    data:{labels:fws,datasets:[
+      ...LOCS.map((l,i)=>({label:l,data:DV[l].fw_vendes,borderColor:GCOLS[i],backgroundColor:'transparent',borderWidth:2,pointRadius:2,tension:.3,yAxisID:'y'})),
+      {label:'Total grup',data:GRUP_V,borderColor:'#aaa',backgroundColor:'transparent',borderWidth:1.5,borderDash:[4,3],pointRadius:2,tension:.3,yAxisID:'y2'}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:true,position:'bottom',labels:{font:{size:9},boxWidth:8,padding:5}},tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${fmt(ctx.raw)}€`}}},
+      scales:{
+        x:{grid:{display:false},ticks:{font:{size:8}}},
+        y:{position:'left',grid:{color:'rgba(0,0,0,0.03)'},ticks:{font:{size:8},callback:v=>fmt(v)+'€'},title:{display:true,text:'Per local',font:{size:8},color:'var(--sub)'}},
+        y2:{position:'right',grid:{display:false},ticks:{font:{size:8},callback:v=>(v/1000).toFixed(0)+'k€'},title:{display:true,text:'Grup',font:{size:8},color:'#aaa'}}
+      }
+    }
+  });
+
+  let tV=`<table class="dtbl"><thead><tr><th>Local</th><th class="tot-col">Mitja/fw</th>${fws.map(f=>`<th>${f}</th>`).join('')}<th class="tot-col">Total</th></tr></thead><tbody>`;
+  LOCS.forEach((l,i)=>{
+    const mitja=mitjes[l];
+    tV+=`<tr><td style="color:${GCOLS[i]}">${l.replace('SM ','').replace('Picu ','P.')}</td>`;
+    tV+=`<td class="tot-col" style="color:var(--sub);font-weight:600">${(mitja/1000).toFixed(1)}k</td>`;
+    DV[l].fw_vendes.forEach(v=>{
+      const p=(v-mitja)/mitja;
+      const bg=p>0.1?'rgba(52,199,89,.15)':p>-0.1?'':'rgba(255,59,48,.13)';
+      const tc=p>0.1?'#1a7a37':p>-0.1?'var(--text)':'#c0392b';
+      tV+=`<td style="background:${bg};color:${tc}${p!==0?';font-weight:600':''}">${(v/1000).toFixed(0)}k</td>`;
+    });
+    tV+=`<td class="tot-col" style="font-weight:700">${(DV[l].total_vendes/1000).toFixed(0)}k</td>`;
+    tV+='</tr>';
+  });
+  const gTot=GRUP_V.reduce((a,b)=>a+b,0);const gMitja=gTot/GRUP_V.length;
+  tV+=`<tr style="border-top:.5px solid var(--sep)"><td style="font-weight:700">Grup</td>`;
+  tV+=`<td class="tot-col" style="color:var(--sub);font-weight:600">${(gMitja/1000).toFixed(1)}k</td>`;
+  GRUP_V.forEach(v=>tV+=`<td style="font-weight:600">${(v/1000).toFixed(0)}k</td>`);
+  tV+=`<td class="tot-col" style="font-weight:700">${(gTot/1000).toFixed(0)}k</td>`;
+  tV+='</tr></tbody></table>';
+  document.getElementById('cg-taula').innerHTML=tV;
+
+  dk('cr');
+  charts['cr']=new Chart(document.getElementById('cr').getContext('2d'),{
+    type:'line',
+    data:{labels:fws,datasets:LOCS.map((l,i)=>({label:l,data:DV[l].fw_ratio_acum,borderColor:GCOLS[i],backgroundColor:'transparent',borderWidth:2,pointRadius:2,tension:.3}))},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:true,position:'bottom',labels:{font:{size:9},boxWidth:8,padding:5}},tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${ctx.raw}%`}}},
+      scales:{x:{grid:{display:false},ticks:{font:{size:8}}},y:{grid:{color:'rgba(0,0,0,0.03)'},ticks:{font:{size:8},callback:v=>v+'%'},min:20,max:65}}
+    }
+  });
+
+  let tR=`<table class="dtbl"><thead><tr><th>Local</th>${fws.map(f=>`<th>${f}</th>`).join('')}<th class="tot-col">Acum.</th></tr></thead><tbody>`;
+  LOCS.forEach((l,i)=>{
+    tR+=`<tr><td style="color:${GCOLS[i]}">${l.replace('SM ','').replace('Picu ','P.')}</td>`;
+    DV[l].fw_ratio.forEach(r=>tR+=`<td style="color:${rc(r)};font-weight:600">${r}%</td>`);
+    tR+=`<td class="tot-col" style="font-weight:700;color:${rc(DV[l].ratio)}">${pc(DV[l].ratio)}</td>`;
+    tR+='</tr>';
+  });
+  tR+=`<tr><td colspan="${fws.length+2}" style="padding:0"><div style="height:8px"></div></td></tr>`;
+  tR+=`<tr><td colspan="${fws.length+2}" style="padding:3px 0;border-bottom:.5px solid var(--sep);font-size:9px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.3px">Ràtio acumulat (fw1→fwN)</td></tr>`;
+  LOCS.forEach((l,i)=>{
+    tR+=`<tr><td style="color:${GCOLS[i]}">${l.replace('SM ','').replace('Picu ','P.')}</td>`;
+    DV[l].fw_ratio_acum.forEach(r=>tR+=`<td style="color:${rc(r)};font-weight:600">${r}%</td>`);
+    tR+=`<td class="tot-col" style="font-weight:700;color:${rc(DV[l].ratio)}">${pc(DV[l].ratio)}</td>`;
+    tR+='</tr>';
+  });
+  tR+=`<tr style="border-top:.5px solid var(--sep)"><td style="font-weight:700">Grup</td>`;
+  GRUP_ACUM.forEach(r=>tR+=`<td style="color:${rc(r)};font-weight:600">${r}%</td>`);
+  tR+=`<td class="tot-col" style="font-weight:700;color:${rc(GRUP_ACUM[GRUP_ACUM.length-1])}">${pc(GRUP_ACUM[GRUP_ACUM.length-1])}</td>`;
+  tR+='</tr></tbody></table>';
+  document.getElementById('cr-taula').innerHTML=tR;
+}
+
+function renderLocDetail(){
+  if(curLoc==='TOTAL'){
+    const totV=LOCS.reduce((s,l)=>s+DV[l].total_vendes,0);
+    const totC=LOCS.reduce((s,l)=>s+DV[l].total_cost,0);
+    const totR=totC/totV*100;
+    const NW=DV['SM Sarrià'].fw_list.length;
+    const mitjaV=Math.round(totV/NW);
+    const fws=DV['SM Sarrià'].fw_list.map(f=>'fw'+f);
+    const grupV=fws.map((_,i)=>LOCS.reduce((s,l)=>s+DV[l].fw_vendes[i],0));
+    const grupR=fws.map((_,i)=>{
+      const v=LOCS.reduce((s,l)=>s+DV[l].fw_vendes[i],0);
+      const c=LOCS.reduce((s,l)=>s+DV[l].fw_cost[i],0);
+      return v>0?parseFloat((c/v*100).toFixed(1)):0;
+    });
+    const grupRacum=grupR.map((_,i)=>{
+      const vAcc=fws.slice(0,i+1).reduce((s,_,j)=>s+grupV[j],0);
+      const cAcc=fws.slice(0,i+1).reduce((s,_,j)=>s+LOCS.reduce((ss,l)=>ss+DV[l].fw_cost[j],0),0);
+      return vAcc>0?parseFloat((cAcc/vAcc*100).toFixed(1)):0;
+    });
+    const top5=LOCS.flatMap(l=>DV[l].top5.map(d=>({...d,loc:l}))).sort((a,b)=>b.v-a.v).slice(0,5);
+    const bot5=LOCS.flatMap(l=>DV[l].bottom5.map(d=>({...d,loc:l}))).sort((a,b)=>a.r-b.r).slice(0,5);
+    const hmAgg={};
+    TORNS_V.forEach(t=>{
+      hmAgg[t]=DIES.map((_,di)=>LOCS.reduce((s,l)=>s+(DV[l].heatmap[t]?.[di]||0),0));
+    });
+    const avgDiaV=DIES.map((_,di)=>Math.round(LOCS.reduce((s,l)=>s+(DV[l].avg_dia_vendes[di]||0),0)));
+    const avgDiaR=DIES.map((_,di)=>{
+      const totD=avgDiaV[di];
+      const costD=LOCS.reduce((s,l)=>s+((DV[l].avg_dia_vendes[di]||0)*(DV[l].avg_dia_ratio[di]||0)/100),0);
+      return totD>0?parseFloat((costD/totD*100).toFixed(1)):0;
+    });
+
+    let html=`
+    <div class="loc-banner" style="background:#55555512;border-left:4px solid #555">
+      <div style="width:10px;height:10px;border-radius:50%;background:#555;flex-shrink:0"></div>
+      <div style="flex:1"><div style="font-size:15px;font-weight:700;color:#555">Total Grup</div>
+      <div style="font-size:11px;color:#555;opacity:.75">4 locals · fw1–fw16 · 2026</div></div>
+    </div>
+    <div class="krow k3" style="margin-bottom:8px">
+      <div class="kpi"><div class="kl">Vendes netes</div><div class="kv" style="font-size:16px">${fmt(totV)}€</div><div class="ks">Mitja ${fmt(mitjaV)}€/fw</div></div>
+      <div class="kpi"><div class="kl">Cost personal</div><div class="kv" style="font-size:16px">${fmt(totC)}€</div></div>
+      <div class="kpi"><div class="kl">Ràtio P/V</div><div class="kv ${sf(totR)}">${pc(totR)} ${si(totR)}</div></div>
+    </div>
+    <div class="card">
+      <div class="ch"><span class="ct">Vendes · Cost · Ràtio per setmana · Grup</span></div>
+      <div class="cb" style="padding:6px 4px 8px">
+        <div class="cwm"><canvas id="c-tot"></canvas></div>
+        <div style="overflow-x:auto;margin-top:6px"><table class="dtbl"><thead><tr>
+          <th></th>${fws.map(f=>`<th>${f}</th>`).join('')}<th class="tot-col">Total</th>
+        </tr></thead><tbody>`;
+    LOCS.forEach((l,i)=>{
+      html+=`<tr><td style="color:${GCOLS[i]}">${l.replace('SM ','').replace('Picu ','P.')}</td>`;
+      DV[l].fw_vendes.forEach(v=>html+=`<td>${(v/1000).toFixed(0)}k</td>`);
+      html+=`<td class="tot-col" style="font-weight:700">${fmt(DV[l].total_vendes)}€</td></tr>`;
+    });
+    html+=`<tr style="border-top:1px solid var(--sep);background:rgba(0,0,0,.03)"><td style="font-weight:700">Grup</td>`;
+    grupV.forEach(v=>html+=`<td style="font-weight:700">${(v/1000).toFixed(0)}k</td>`);
+    html+=`<td class="tot-col" style="font-weight:700">${fmt(totV)}€</td></tr>`;
+    html+=`<tr><td style="color:#ff9f0a">Ràtio</td>`;
+    grupR.forEach(r=>html+=`<td style="color:${rc(r)};font-weight:600">${r}%</td>`);
+    html+=`<td class="tot-col" style="font-weight:700;color:${rc(totR)}">${pc(totR)}</td></tr>`;
+    html+=`<tr><td style="color:#aaa">Acum.</td>`;
+    grupRacum.forEach(r=>html+=`<td style="color:${rc(r)}">${r}%</td>`);
+    html+=`<td class="tot-col" style="color:${rc(totR)}">${pc(totR)}</td></tr>`;
+    html+=`</tbody></table></div></div></div>
+    <div class="card">
+      <div class="ch"><span class="ct">Vendes per torn i dia (€ mitjà/dia) · Grup</span></div>
+      <div class="cb" style="padding:6px 4px 8px">
+        <div class="cws"><canvas id="c-tot-dia"></canvas></div>
+        <div style="overflow-x:auto;margin-top:6px" id="tot-dia-taula"></div>
+      </div>
+    </div>
+    <div class="g2">
+      <div class="card"><div class="ch"><span class="ct" style="color:var(--ok)">Top 5 ⬆ Grup</span></div>
+        <div class="cb" style="padding:4px 10px">${top5.map(r=>`<div class="day-row">
+          <div style="display:flex;justify-content:space-between">
+            <span style="font-size:12px;font-weight:700">${r.data} <span style="color:var(--sub);font-size:10px">${r.dia}</span></span>
+            <span style="font-size:12px;font-weight:700">${fmt(r.v)}€</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:1px">
+            <span style="font-size:10px;color:var(--sub)">${r.loc.replace('SM ','').replace('Picu ','P.')}</span>
+            <span style="font-size:11px;font-weight:600;color:${rc(r.r)}">${r.r}%</span>
+          </div></div>`).join('')}</div>
+      </div>
+      <div class="card"><div class="ch"><span class="ct" style="color:var(--bad)">Bottom 5 ⬇ Grup</span></div>
+        <div class="cb" style="padding:4px 10px">${bot5.map(r=>`<div class="day-row">
+          <div style="display:flex;justify-content:space-between">
+            <span style="font-size:12px;font-weight:700">${r.data} <span style="color:var(--sub);font-size:10px">${r.dia}</span></span>
+            <span style="font-size:12px;font-weight:700">${fmt(r.v)}€</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:1px">
+            <span style="font-size:10px;color:var(--sub)">${r.loc.replace('SM ','').replace('Picu ','P.')}</span>
+            <span style="font-size:11px;font-weight:600;color:var(--bad)">${r.r}%</span>
+          </div></div>`).join('')}</div>
+      </div>
+    </div>`;
+
+    document.getElementById('loc-detail').innerHTML=html;
+
+    setTimeout(()=>{
+      dk('ctot');
+      charts['ctot']=new Chart(document.getElementById('c-tot').getContext('2d'),{
+        type:'bar',
+        data:{labels:fws,datasets:[
+          ...LOCS.map((l,i)=>({type:'bar',label:l.replace('SM ','').replace('Picu ','P.'),data:DV[l].fw_vendes,backgroundColor:GCOLS[i]+'cc',borderRadius:2,stack:'s',yAxisID:'y'})),
+          {type:'line',label:'Ràtio %',data:grupR,borderColor:'#ff9f0a',backgroundColor:'transparent',borderWidth:2,pointRadius:2,tension:.3,yAxisID:'y2'},
+          {type:'line',label:'Acum.',data:grupRacum,borderColor:'#aaa',backgroundColor:'transparent',borderWidth:1.5,borderDash:[3,3],pointRadius:2,tension:.3,yAxisID:'y2'},
+        ]},
+        options:{responsive:true,maintainAspectRatio:false,
+          plugins:{legend:{position:'bottom',labels:{font:{size:9},boxWidth:9}}},
+          scales:{x:{stacked:true,ticks:{font:{size:7}}},y:{stacked:true,position:'left',ticks:{font:{size:8},callback:v=>fmt(v)+'€'}},y2:{position:'right',grid:{display:false},ticks:{font:{size:8},callback:v=>v+'%'},min:20,max:65}}}
+      });
+      dk('ctotdia');
+      charts['ctotdia']=new Chart(document.getElementById('c-tot-dia').getContext('2d'),{
+        type:'bar',
+        data:{labels:DIES,datasets:[
+          {type:'bar',label:'Vendes',data:avgDiaV,backgroundColor:DIES.map((_,i)=>i>=4?'#555ee':'#555aa'),borderRadius:4,yAxisID:'y'},
+          {type:'line',label:'Ràtio %',data:avgDiaR,borderColor:'#ff9f0a',backgroundColor:'transparent',borderWidth:2.5,pointRadius:4,yAxisID:'y2'},
+        ]},
+        options:{responsive:true,maintainAspectRatio:false,
+          plugins:{legend:{position:'bottom',labels:{font:{size:9},boxWidth:9}}},
+          scales:{x:{grid:{display:false},ticks:{font:{size:10}},categoryPercentage:0.6,barPercentage:0.8},y:{ticks:{font:{size:8},callback:v=>fmt(v)+'€'}},y2:{position:'right',grid:{display:false},ticks:{font:{size:8},callback:v=>v+'%'},min:20}}}
+      });
+      const ta=TORNS_V.filter(t=>hmAgg[t]&&hmAgg[t].some(v=>v>0));
+      const totPerDia=DIES.map((_,di)=>ta.reduce((s,t)=>s+(hmAgg[t][di]||0),0));
+      const totGenHm=totPerDia.reduce((a,b)=>a+b,0);
+      let tdT=`<table class="dtbl"><thead><tr><th>Torn</th>${DIES.map(di=>`<th>${di}</th>`).join('')}<th class="tot-col">Total</th></tr></thead><tbody>`;
+      ta.forEach(t=>{
+        const totT=hmAgg[t].reduce((a,b)=>a+b,0);
+        tdT+=`<tr><td style="color:#555;font-weight:700">${t}</td>`;
+        hmAgg[t].forEach(v=>tdT+=`<td>${v>0?fmt(v)+'€':'—'}</td>`);
+        tdT+=`<td class="tot-col" style="font-weight:700">${fmt(totT)}€</td></tr>`;
+      });
+      tdT+=`<tr style="border-top:.5px solid var(--sep);background:rgba(0,0,0,0.02)"><td style="font-weight:700">Total</td>`;
+      totPerDia.forEach(v=>tdT+=`<td style="font-weight:700">${fmt(v)}€</td>`);
+      tdT+=`<td class="tot-col" style="font-weight:700">${fmt(totGenHm)}€</td></tr>`;
+      tdT+=`<tr style="border-top:1px solid var(--sep)"><td style="font-weight:600;font-size:9px;color:var(--sub)">Ràtio P/V</td>`;
+      avgDiaR.forEach(r=>tdT+=`<td style="text-align:center;font-weight:700;color:${rc(r)};background:${rcbg(r)}">${r}%</td>`);
+      const avgR=parseFloat((avgDiaR.filter(r=>r>0).reduce((a,b)=>a+b,0)/avgDiaR.filter(r=>r>0).length).toFixed(1));
+      tdT+=`<td class="tot-col" style="font-weight:700;color:${rc(avgR)}">${avgR}%</td></tr>`;
+      tdT+='</tbody></table>';
+      document.getElementById('tot-dia-taula').innerHTML=tdT;
+    },50);
+    return;
+  }
+
+  const d=DV[curLoc];
+  const col=GCOLS[LOCS.indexOf(curLoc)];
+  const fws=d.fw_list.map(f=>'fw'+f);
+  const mitjaV=d.mitja_vendes;
+
+  document.getElementById('loc-detail').innerHTML=`
+    <div class="loc-banner" style="background:${col}12;border-left:4px solid ${col}">
+      <div style="width:10px;height:10px;border-radius:50%;background:${col};flex-shrink:0"></div>
+      <div style="flex:1">
+        <div style="font-size:15px;font-weight:700;color:${col}">${curLoc}</div>
+        <div style="font-size:11px;color:${col};opacity:.75">${d.dies} dies · fw1–fw16 · 2026</div>
+      </div>
+    </div>
+    <div class="krow k3" style="margin-bottom:8px">
+      <div class="kpi"><div class="kl">Vendes netes</div><div class="kv" style="font-size:16px">${fmt(d.total_vendes)}€</div><div class="ks">Mitja ${fmt(mitjaV)}€/fw</div></div>
+      <div class="kpi"><div class="kl">Cost personal</div><div class="kv" style="font-size:16px">${fmt(d.total_cost)}€</div></div>
+      <div class="kpi"><div class="kl">Ràtio P/V</div><div class="kv ${sf(d.ratio)}">${pc(d.ratio)} ${si(d.ratio)}</div></div>
+    </div>
+    <div class="card">
+      <div class="ch"><span class="ct">Vendes · Cost · Ràtio per setmana</span></div>
+      <div class="cb" style="padding:6px 4px 8px">
+        <div class="cwm"><canvas id="c-lm"></canvas></div>
+        <div id="lm-taula" style="margin-top:6px;overflow-x:auto"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ch"><span class="ct">Vendes per torn i dia (€ mitjà/dia)</span></div>
+      <div class="cb" style="padding:6px 4px 8px">
+        <div class="cws"><canvas id="c-ld"></canvas></div>
+        <div id="ld-taula" style="margin-top:6px;overflow-x:auto"></div>
+      </div>
+    </div>
+    <div class="g2">
+      <div class="card"><div class="ch"><span class="ct" style="color:var(--ok)">Top 5 ⬆</span></div>
+        <div class="cb" style="padding:4px 10px">${topRows(d.top5,false)}</div>
+      </div>
+      <div class="card"><div class="ch"><span class="ct" style="color:var(--bad)">Bottom 5 ⬇</span></div>
+        <div class="cb" style="padding:4px 10px">${topRows(d.bottom5,true)}</div>
+      </div>
+    </div>
+    <div id="loc-vendes-detail"></div>
+  `;
+
+  setTimeout(()=>{
+    dk('clm');
+    charts['clm']=new Chart(document.getElementById('c-lm').getContext('2d'),{
+      type:'bar',
+      data:{labels:fws,datasets:[
+        {type:'bar',label:'Vendes',data:d.fw_vendes,backgroundColor:d.fw_vendes.map(v=>{const p=(v-mitjaV)/mitjaV;return p>0.1?'rgba(52,199,89,.75)':p>-0.1?col+'99':'rgba(255,59,48,.65)';}),borderRadius:3,borderSkipped:false,yAxisID:'y'},
+        {type:'bar',label:'Cost',data:d.fw_cost,backgroundColor:d.color2+'88',borderRadius:3,borderSkipped:false,yAxisID:'y'},
+        {type:'line',label:'Ràtio %',data:d.fw_ratio,borderColor:'#ff9f0a',backgroundColor:'transparent',borderWidth:2,pointRadius:3,pointBackgroundColor:d.fw_ratio.map(r=>rc(r)),tension:.3,yAxisID:'y2'},
+        {type:'line',label:'Ràtio acum.',data:d.fw_ratio_acum,borderColor:'#aaa',backgroundColor:'transparent',borderWidth:1.5,borderDash:[3,3],pointRadius:2,tension:.3,yAxisID:'y2'},
+      ]},
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:true,position:'bottom',labels:{font:{size:9},boxWidth:9,padding:4}},tooltip:{callbacks:{label:ctx=>ctx.dataset.label.includes('%')||ctx.dataset.label.includes('Ràtio')?`${ctx.dataset.label}: ${ctx.raw}%`:`${ctx.dataset.label}: ${fmt(ctx.raw)}€`}}},
+        scales:{x:{grid:{display:false},ticks:{font:{size:7}}},y:{position:'left',grid:{color:'rgba(0,0,0,0.03)'},ticks:{font:{size:8},callback:v=>fmt(v)+'€'}},y2:{position:'right',grid:{display:false},ticks:{font:{size:8},callback:v=>v+'%'},min:20,max:65}}
+      }
+    });
+
+    const totV=d.fw_vendes.reduce((a,b)=>a+b,0);
+    const totC=d.fw_cost.reduce((a,b)=>a+b,0);
+    let tw=`<table class="dtbl"><thead><tr><th></th>${fws.map(f=>`<th>${f}</th>`).join('')}<th class="tot-col">Total</th></tr></thead><tbody>`;
+    tw+=`<tr><td style="color:${col}">Vendes</td>${d.fw_vendes.map(v=>{const p=(v-mitjaV)/mitjaV;const bg=p>0.1?'rgba(52,199,89,.13)':p>-0.1?'':'rgba(255,59,48,.12)';const tc=p>0.1?'#1a7a37':p>-0.1?'var(--text)':'#c0392b';return`<td style="background:${bg};color:${tc};font-weight:600">${(v/1000).toFixed(0)}k</td>`}).join('')}<td class="tot-col" style="font-weight:700">${fmt(totV)}€</td></tr>`;
+    tw+=`<tr><td style="color:${d.color2}">Cost</td>${d.fw_cost.map(v=>`<td>${(v/1000).toFixed(0)}k</td>`).join('')}<td class="tot-col" style="font-weight:700">${fmt(totC)}€</td></tr>`;
+    tw+=`<tr><td style="color:#ff9f0a">Ràtio</td>${d.fw_ratio.map(r=>`<td style="color:${rc(r)};font-weight:600">${r}%</td>`).join('')}<td class="tot-col" style="color:${rc(d.ratio)};font-weight:700">${pc(d.ratio)}</td></tr>`;
+    tw+=`<tr><td style="color:#aaa">Acum.</td>${d.fw_ratio_acum.map(r=>`<td style="color:${rc(r)}">${r}%</td>`).join('')}<td class="tot-col" style="color:${rc(d.ratio)};font-weight:700">${pc(d.ratio)}</td></tr>`;
+    tw+='</tbody></table>';
+    document.getElementById('lm-taula').innerHTML=tw;
+
+    dk('cld');
+    charts['cld']=new Chart(document.getElementById('c-ld').getContext('2d'),{
+      type:'bar',
+      data:{labels:DIES,datasets:[
+        {type:'bar',label:'Vendes',data:d.avg_dia_vendes,backgroundColor:DIES.map((_,i)=>i>=4?col+'ee':col+'66'),borderRadius:4,borderSkipped:false,yAxisID:'y'},
+        {type:'line',label:'Ràtio %',data:d.avg_dia_ratio,borderColor:'#ff9f0a',backgroundColor:'transparent',borderWidth:2.5,pointRadius:4,pointBackgroundColor:d.avg_dia_ratio.map(r=>rc(r)),tension:.3,yAxisID:'y2'},
+      ]},
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:true,position:'bottom',labels:{font:{size:9},boxWidth:9,padding:4}},tooltip:{callbacks:{label:ctx=>ctx.dataset.label==='Ràtio %'?`Ràtio: ${ctx.raw}%`:`Vendes: ${fmt(ctx.raw)}€`}}},
+        scales:{x:{grid:{display:false},ticks:{font:{size:10}},categoryPercentage:0.6,barPercentage:0.8},y:{position:'left',grid:{color:'rgba(0,0,0,0.03)'},ticks:{font:{size:8},callback:v=>fmt(v)+'€'}},y2:{position:'right',grid:{display:false},ticks:{font:{size:8},callback:v=>v+'%'},min:20}}
+      }
+    });
+
+    const hm=d.heatmap;
+    const ta=TORNS_V.filter(t=>hm[t]&&hm[t].some(v=>v>0));
+    const totPerDia=DIES.map((_,di)=>ta.reduce((s,t)=>s+(hm[t][di]||0),0));
+    const totGeneral=totPerDia.reduce((a,b)=>a+b,0);
+    let tdT=`<table class="dtbl"><thead><tr><th>Torn</th>${DIES.map(di=>`<th>${di}</th>`).join('')}<th class="tot-col">Total</th></tr></thead><tbody>`;
+    ta.forEach(t=>{
+      const totT=hm[t].reduce((a,b)=>a+b,0);
+      tdT+=`<tr><td style="color:${col};font-weight:700">${t}</td>`;
+      hm[t].forEach(v=>tdT+=`<td>${v>0?fmt(v)+'€':'—'}</td>`);
+      tdT+=`<td class="tot-col" style="font-weight:700">${fmt(totT)}€</td></tr>`;
+    });
+    tdT+=`<tr style="border-top:.5px solid var(--sep);background:rgba(0,0,0,0.02)"><td style="font-weight:700">Total</td>`;
+    totPerDia.forEach(v=>tdT+=`<td style="font-weight:700">${fmt(v)}€</td>`);
+    tdT+=`<td class="tot-col" style="font-weight:700">${fmt(totGeneral)}€</td></tr>`;
+    tdT+=ratioGrid(d);
+    tdT+='</tbody></table>';
+    document.getElementById('ld-taula').innerHTML=tdT;
+    renderLocVendesDetail(curLoc, col);
+  },50);
+}
+
+function ratioGrid(d){
+  const avgRatio=d.avg_dia_ratio.reduce((a,b)=>a+b,0)/d.avg_dia_ratio.length;
+  const cells=d.avg_dia_ratio.map(r=>`<td style="padding:3px 2px;text-align:center;font-weight:700;color:${rc(r)};background:${rcbg(r)}">${r.toFixed(1)}%</td>`).join('');
+  return`<tr style="border-top:1px solid var(--sep)"><td style="padding:3px 2px;font-weight:600;font-size:9px;color:var(--sub)">Ràtio P/V</td>${cells}<td class="tot-col" style="font-weight:700;color:${rc(avgRatio)};background:${rcbg(avgRatio)};text-align:center">${avgRatio.toFixed(1)}%</td></tr>`;
+}
+
+function topRows(rows,bad){
+  return rows.map(r=>`<div class="day-row">
+    <div style="display:flex;justify-content:space-between">
+      <span style="font-size:12px;font-weight:700">${r.data} <span style="color:var(--sub);font-size:10px">${r.dia}</span></span>
+      <span style="font-size:12px;font-weight:700">${fmt(r.v)}€</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-top:1px">
+      <span style="font-size:10px;color:var(--sub)">${CTX[r.data]||''}</span>
+      <span style="font-size:11px;font-weight:600;color:${bad?'var(--bad)':rc(r.r)}">${r.r}%</span>
+    </div>
+  </div>`).join('');
+}
+
+function renderPerDetail(){
+  if(curPer==='TOTAL'){
+    const fws=DP['SM Sarrià'].fw_list.map(f=>'fw'+f);
+    const totH=LOCS.reduce((s,l)=>s+DP[l].tot_h,0);
+    const totCoc=LOCS.reduce((s,l)=>s+DP[l].tot_hcoc,0);
+    const totSal=LOCS.reduce((s,l)=>s+DP[l].tot_hsal,0);
+    const totCost=LOCS.reduce((s,l)=>s+DP[l].tot_cost,0);
+    const totAbs=LOCS.reduce((s,l)=>s+Math.round((DP[l].absencies.tot_baixa+DP[l].absencies.tot_accident)/8),0);
+    const totAbsCost=LOCS.reduce((s,l)=>s+DP[l].absencies.cost_total,0);
+    const totV=LOCS.reduce((s,l)=>s+DV[l].total_vendes,0);
+    const ratioG=totCost/totV*100;
+
+    let html=`<div class="loc-banner" style="background:#55555512;border-left:4px solid #555">
+      <div style="width:10px;height:10px;border-radius:50%;background:#555;flex-shrink:0"></div>
+      <div style="flex:1"><div style="font-size:15px;font-weight:700;color:#555">Total Grup · Personal</div>
+      <div style="font-size:11px;color:#555;opacity:.75">fw1–fw16 · 2026 · @${COSTE_HORA}€/h</div></div></div>
+    <div class="krow k3" style="margin-bottom:8px">
+      <div class="kpi"><div class="kl">Total hores</div><div class="kv" style="font-size:16px">${fmt(totH)}h</div></div>
+      <div class="kpi"><div class="kl">Cost personal</div><div class="kv" style="font-size:16px">${(totCost/1000).toFixed(1)}k€</div><div class="ks">@${COSTE_HORA}€/h</div></div>
+      <div class="kpi"><div class="kl">Ràtio P/V</div><div class="kv ${sf(ratioG)}">${pc(ratioG)} ${si(ratioG)}</div></div>
+    </div>
+    <div class="card"><div class="ch"><span class="ct">Hores i cost per local · fw1–fw16</span></div>
+    <div class="cb" style="overflow-x:auto;padding:6px 8px"><table class="dtbl" style="font-size:11px">
+      <thead><tr><th style="text-align:left">Local</th><th>H.Cuina</th><th>H.Sala</th><th>H.Total</th><th>Cost</th><th>€/h</th><th>Ràtio</th></tr></thead><tbody>`;
+    LOCS.forEach((l,i)=>{
+      const p=DP[l],v=DV[l];
+      html+=`<tr><td style="color:${GCOLS[i]};font-weight:600">${l.replace('SM ','').replace('Picu ','P.')}</td>
+        <td>${fmt(p.tot_hcoc)}h</td><td>${fmt(p.tot_hsal)}h</td><td style="font-weight:700">${fmt(p.tot_h)}h</td>
+        <td style="font-weight:700">${(p.tot_cost/1000).toFixed(1)}k€</td>
+        <td style="color:var(--sub)">${COSTE_HORA}€</td>
+        <td style="font-weight:700;color:${rc(v.ratio)}">${pc(v.ratio)}</td></tr>`;
+    });
+    html+=`<tr style="border-top:1px solid var(--sep);background:rgba(0,0,0,.03)">
+      <td style="font-weight:700">TOTAL</td>
+      <td style="font-weight:700">${fmt(totCoc)}h</td><td style="font-weight:700">${fmt(totSal)}h</td>
+      <td style="font-weight:700">${fmt(totH)}h</td><td style="font-weight:700">${(totCost/1000).toFixed(1)}k€</td>
+      <td></td><td style="font-weight:700;color:${rc(ratioG)}">${pc(ratioG)}</td></tr>
+    </tbody></table></div></div>
+    <div class="card"><div class="ch"><span class="ct">Cost per setmana · grup</span></div>
+    <div class="cb" style="overflow-x:auto;padding:6px 8px"><table class="dtbl">
+      <thead><tr><th style="text-align:left">Local</th>${fws.map(f=>`<th>${f}</th>`).join('')}<th class="tot-col">Total</th></tr></thead><tbody>`;
+    LOCS.forEach((l,i)=>{
+      const p=DP[l];
+      html+=`<tr><td style="color:${GCOLS[i]};font-weight:600">${l.replace('SM ','').replace('Picu ','P.')}</td>`;
+      p.fw_cost_p.forEach(v=>html+=`<td>${(v/1000).toFixed(1)}k€</td>`);
+      html+=`<td class="tot-col" style="font-weight:700">${(p.tot_cost/1000).toFixed(1)}k€</td></tr>`;
+    });
+    const grCostFw=fws.map((_,i)=>LOCS.reduce((s,l)=>s+DP[l].fw_cost_p[i],0));
+    html+=`<tr style="border-top:1px solid var(--sep);background:rgba(0,0,0,.03)"><td style="font-weight:700">Grup</td>`;
+    grCostFw.forEach(v=>html+=`<td style="font-weight:700">${(v/1000).toFixed(1)}k€</td>`);
+    html+=`<td class="tot-col" style="font-weight:700">${(totCost/1000).toFixed(1)}k€</td></tr>`;
+    html+=`</tbody></table></div></div>
+    <div class="card"><div class="ch"><span class="ct">Absències · resum per local</span>
+      <span style="font-size:12px;font-weight:700;color:var(--bad)">${totAbs}d · ${fmt(totAbsCost)}€</span></div>
+    <div class="cb" style="overflow-x:auto;padding:6px 8px"><table class="dtbl" style="font-size:11px">
+      <thead><tr><th style="text-align:left">Local</th><th>Dies</th><th>Cost est.</th></tr></thead><tbody>`;
+    LOCS.forEach((l,i)=>{
+      const a=DP[l].absencies;
+      const dies=Math.round((a.tot_baixa+a.tot_accident)/8);
+      html+=`<tr><td style="color:${GCOLS[i]};font-weight:600">${l.replace('SM ','').replace('Picu ','P.')}</td>
+        <td style="color:var(--bad);font-weight:700">${dies}d</td>
+        <td style="color:var(--bad);font-weight:700">${fmt(a.cost_total)}€</td></tr>`;
+    });
+    html+=`<tr style="border-top:1px solid var(--sep)"><td style="font-weight:700">TOTAL</td>
+      <td style="font-weight:700;color:var(--bad)">${totAbs}d</td>
+      <td style="font-weight:700;color:var(--bad)">${fmt(totAbsCost)}€</td></tr>`;
+    html+=`</tbody></table></div></div>`;
+    document.getElementById('per-detail').innerHTML=html;
+    return;
+  }
+
+  const p=DP[curPer];
+  const v=DV[curPer];
+  const col=GCOLS[LOCS.indexOf(curPer)];
+  const fws=p.fw_list.map(f=>'fw'+f);
+  const ratH=Math.round(p.tot_hcoc/p.tot_h*100);
+
+  document.getElementById('per-detail').innerHTML=`
+    <div class="loc-banner" style="background:${col}12;border-left:4px solid ${col}">
+      <div style="width:10px;height:10px;border-radius:50%;background:${col};flex-shrink:0"></div>
+      <div style="flex:1">
+        <div style="font-size:15px;font-weight:700;color:${col}">${curPer}</div>
+        <div style="font-size:11px;color:${col};opacity:.75">Personal · fw1–fw16 · 2026</div>
+      </div>
+    </div>
+    <div class="krow k3" style="margin-bottom:8px">
+      <div class="kpi"><div class="kl">Total hores</div><div class="kv" style="font-size:17px">${fmt(p.tot_h)}h</div>${p.tot_hvac>0?`<div class="ks" style="color:#aaa">+${p.tot_hvac}h vacances</div>`:''}</div>
+      <div class="kpi"><div class="kl">Cost personal</div><div class="kv" style="font-size:17px">${(p.tot_cost/1000).toFixed(1)}k€</div><div class="ks" style="color:var(--sub)">@${COSTE_HORA}€/h</div></div>
+      <div class="kpi"><div class="kl">Ràtio P/V</div><div class="kv ${sf(v.ratio)}">${pc(v.ratio)} ${si(v.ratio)}</div></div>
+    </div>
+    <div class="krow k2" style="margin-bottom:8px">
+      <div class="kpi"><div class="kl">Hores cuina</div><div class="kv" style="font-size:18px;color:${col}">${fmt(p.tot_hcoc)}h</div><div class="ks">${ratH}% del total</div></div>
+      <div class="kpi"><div class="kl">Hores sala</div><div class="kv" style="font-size:18px;color:${col}99">${fmt(p.tot_hsal)}h</div><div class="ks">${100-ratH}% del total</div></div>
+    </div>
+    <div class="card">
+      <div class="ch"><span class="ct">Hores cuina i sala per setmana</span></div>
+      <div class="cb" style="padding:6px 4px 8px">
+        <div class="cwm"><canvas id="c-ph"></canvas></div>
+        <div id="ph-taula" style="margin-top:6px;overflow-x:auto"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ch"><span class="ct">Hores per torn (cuina i sala)</span></div>
+      <div class="cb" style="padding:6px 12px">${tornTaula(p,col)}</div>
+    </div>
+    <div class="card">
+      <div class="ch"><span class="ct">Hores per dia de la setmana (mitjana)</span></div>
+      <div class="cb" style="padding:6px 4px 8px">
+        <div class="cws"><canvas id="c-pd"></canvas></div>
+        <div style="margin-top:6px;overflow-x:auto">${horesDiaTaula(p,col)}</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ch">
+        <span class="ct">Absències per setmana (hores)</span>
+        <span style="font-size:12px;font-weight:700;color:var(--bad)">${fmt(p.absencies.cost_total)}€ cost est.</span>
+      </div>
+      <div class="cb" style="padding:6px 8px;overflow-x:auto">
+        ${(()=>{
+          const a=p.absencies;
+          const fws=p.fw_list.map(f=>'fw'+f);
+          const rows=[
+            {nom:'Vacances',        data:a.fw_vacances, tot:a.tot_vacances, color:'#4A90D9', impacte:false},
+            {nom:'Baixa malaltia',  data:a.fw_baixa,    tot:a.tot_baixa,    color:'#E74C3C', impacte:true},
+            {nom:'Accident laboral',data:a.fw_accident, tot:a.tot_accident, color:'#E67E22', impacte:true},
+            {nom:'Absència injust.',data:a.fw_injust,   tot:a.tot_injust,   color:'#8E44AD', impacte:false},
+            {nom:'Altres',          data:a.fw_altres,   tot:a.tot_altres,   color:'#7F8C8D', impacte:false},
+          ];
+          let t=`<table class="dtbl" style="font-size:11px"><thead><tr><th style="text-align:left">Tipus</th>${fws.map(f=>`<th>${f}</th>`).join('')}<th class="tot-col">Total</th></tr></thead><tbody>`;
+          rows.forEach(r=>{
+            if(r.tot===0) return;
+            t+=`<tr><td style="color:${r.color};font-weight:600">${r.nom}</td>${r.data.map(v=>`<td>${v>0?v+'h':'—'}</td>`).join('')}<td class="tot-col" style="color:${r.color};font-weight:700">${fmt(r.tot)}h</td></tr>`;
+          });
+          // Total
+          const totAll = rows.reduce((s,r)=>s+r.tot,0);
+          const fwTot = fws.map((_,i)=>rows.reduce((s,r)=>s+(r.data[i]||0),0));
+          t+=`<tr style="border-top:1px solid var(--sep);background:rgba(0,0,0,.03)"><td style="font-weight:700">Total</td>${fwTot.map(v=>`<td style="font-weight:700">${v>0?v+'h':'—'}</td>`).join('')}<td class="tot-col" style="font-weight:700">${fmt(totAll)}h</td></tr>`;
+          t+=`</tbody></table>`;
+          // Impacte econòmic
+          t+=`<div style="height:.5px;background:var(--sep);margin:10px 0 8px"></div>`;
+          t+=`<div style="font-size:10px;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:.3px;margin-bottom:6px">Impacte econòmic (només baixes i accidents · 6€/h)</div>`;
+          t+=`<table class="tbl" style="font-size:12px"><tbody>`;
+          if(a.tot_baixa>0){
+            t+=`<tr><td style="color:#E74C3C;font-weight:600">Baixa malaltia</td><td style="text-align:right;color:var(--sub)">${a.tot_baixa}h · ${a.tot_baixa/8}d</td><td style="text-align:right;color:var(--bad);font-weight:700">${fmt(a.cost_baixa)}€</td></tr>`;
+          }
+          if(a.tot_accident>0){
+            t+=`<tr><td style="color:#E67E22;font-weight:600">Accident laboral</td><td style="text-align:right;color:var(--sub)">${a.tot_accident}h · ${a.tot_accident/8}d</td><td style="text-align:right;color:var(--bad);font-weight:700">${fmt(a.cost_accident)}€</td></tr>`;
+          }
+          t+=`<tr style="border-top:1px solid var(--sep)"><td style="font-weight:700">Total impacte</td><td style="text-align:right;color:var(--sub);font-weight:700">${(a.tot_baixa+a.tot_accident)}h · ${(a.tot_baixa+a.tot_accident)/8}d</td><td style="text-align:right;color:var(--bad);font-weight:700">${fmt(a.cost_total)}€</td></tr>`;
+          t+=`</tbody></table>`;
+          return t;
+        })()}
+      </div>
+    </div>
+  `;
+
+  setTimeout(()=>{
+    dk('cph');
+    charts['cph']=new Chart(document.getElementById('c-ph').getContext('2d'),{
+      type:'bar',
+      data:{labels:fws,datasets:[
+        {label:'Cuina',data:p.fw_hcoc,backgroundColor:col+'cc',borderRadius:3,borderSkipped:false,stack:'h'},
+        {label:'Sala',data:p.fw_hsal,backgroundColor:col+'55',borderRadius:3,borderSkipped:false,stack:'h'},
+      ]},
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:true,position:'bottom',labels:{font:{size:9},boxWidth:9,padding:5}}},
+        scales:{x:{stacked:true,grid:{display:false},ticks:{font:{size:7}}},y:{stacked:true,grid:{color:'rgba(0,0,0,0.03)'},ticks:{font:{size:8},callback:v=>v+'h'}}}
+      }
+    });
+
+    const mitjaFw=fws.length;
+    const vacCoc=(p.fw_hvac_coc||[]).reduce((a,b)=>a+b,0);
+    const vacSal=(p.fw_hvac_sal||[]).reduce((a,b)=>a+b,0);
+    let th=`<table class="dtbl"><thead><tr><th></th>${fws.map(f=>`<th>${f}</th>`).join('')}<th class="tot-col" style="background:#f0f4ff">Mitja/fw</th><th class="tot-col">Total acum.</th></tr></thead><tbody>`;
+    th+=`<tr><td style="color:${col}">Cuina</td>${p.fw_hcoc.map(v=>`<td>${v}h</td>`).join('')}<td class="tot-col" style="background:#f0f4ff;color:var(--sub)">${Math.round(p.tot_hcoc/mitjaFw)}h</td><td class="tot-col" style="font-weight:700">${fmt(p.tot_hcoc)}h</td></tr>`;
+    th+=`<tr><td style="color:${col}99">Sala</td>${p.fw_hsal.map(v=>`<td>${v}h</td>`).join('')}<td class="tot-col" style="background:#f0f4ff;color:var(--sub)">${Math.round(p.tot_hsal/mitjaFw)}h</td><td class="tot-col" style="font-weight:700">${fmt(p.tot_hsal)}h</td></tr>`;
+    th+=`<tr><td style="font-weight:700">Total</td>${p.fw_htot.map(v=>`<td style="font-weight:700">${v}h</td>`).join('')}<td class="tot-col" style="background:#f0f4ff;font-weight:700;color:var(--sub)">${Math.round(p.tot_h/mitjaFw)}h</td><td class="tot-col" style="font-weight:700">${fmt(p.tot_h)}h</td></tr>`;
+    // ── Files d'ajust admin (nomes si el rol es admin) ──
+    if(SESSION && SESSION.rol === 'admin' && p.ajustos_fw){
+      const hasCoc = p.ajustos_fw.some(a=>a.cocina!==0);
+      const hasSal = p.ajustos_fw.some(a=>a.sala!==0);
+      const totAjCoc = p.ajustos_fw.reduce((s,a)=>s+a.cocina,0);
+      const totAjSal = p.ajustos_fw.reduce((s,a)=>s+a.sala,0);
+      if(hasCoc){
+        th+=`<tr style="background:#fff8e1"><td style="color:#b8860b;font-size:10px" title="Ajustos admin aplicats a cuina">⚙️ Ajust cuina</td>${p.ajustos_fw.map(a=>{
+          const v = a.cocina;
+          if(v===0) return `<td style="color:#ccc;font-size:10px">—</td>`;
+          const sign = v>0?'+':'';
+          const ttl = a.dies_coc ? ` title="${a.dies_coc}"` : '';
+          return `<td style="color:#b8860b;font-size:10px;font-weight:700"${ttl}>${sign}${v}h</td>`;
+        }).join('')}<td class="tot-col" style="background:#fff3c4;color:#b8860b;font-size:10px">—</td><td class="tot-col" style="color:#b8860b;font-size:10px;font-weight:700">${totAjCoc>0?'+':''}${totAjCoc}h</td></tr>`;
+      }
+      if(hasSal){
+        th+=`<tr style="background:#fff8e1"><td style="color:#b8860b;font-size:10px" title="Ajustos admin aplicats a sala">⚙️ Ajust sala</td>${p.ajustos_fw.map(a=>{
+          const v = a.sala;
+          if(v===0) return `<td style="color:#ccc;font-size:10px">—</td>`;
+          const sign = v>0?'+':'';
+          const ttl = a.dies_sal ? ` title="${a.dies_sal}"` : '';
+          return `<td style="color:#b8860b;font-size:10px;font-weight:700"${ttl}>${sign}${v}h</td>`;
+        }).join('')}<td class="tot-col" style="background:#fff3c4;color:#b8860b;font-size:10px">—</td><td class="tot-col" style="color:#b8860b;font-size:10px;font-weight:700">${totAjSal>0?'+':''}${totAjSal}h</td></tr>`;
+      }
+    }
+    const fwVacCoc=p.fw_hvac_coc||Array(mitjaFw).fill(0);
+    const fwVacSal=p.fw_hvac_sal||Array(mitjaFw).fill(0);
+    th+=`<tr style="background:#f5f5f7"><td style="color:#aaa;font-size:8px">Vac. Cuina</td>${fwVacCoc.map(v=>`<td style="color:#aaa;font-size:8px">${v>0?v+'h':'—'}</td>`).join('')}<td class="tot-col" style="color:#aaa;font-size:8px;background:#eeeeee">${vacCoc>0?vacCoc.toFixed(1)+'h':'—'}</td><td class="tot-col" style="color:#aaa;font-size:8px">${vacCoc>0?vacCoc.toFixed(1)+'h':'—'}</td></tr>`;
+    th+=`<tr style="background:#f5f5f7"><td style="color:#aaa;font-size:8px">Vac. Sala</td>${fwVacSal.map(v=>`<td style="color:#aaa;font-size:8px">${v>0?v+'h':'—'}</td>`).join('')}<td class="tot-col" style="color:#aaa;font-size:8px;background:#eeeeee">${vacSal>0?vacSal.toFixed(1)+'h':'—'}</td><td class="tot-col" style="color:#aaa;font-size:8px">${vacSal>0?vacSal.toFixed(1)+'h':'—'}</td></tr>`;
+    th+=`<tr><td style="color:var(--sub)">Cost <span style="font-size:8px;opacity:.7">@${COSTE_HORA}€/h</span></td>${p.fw_cost_p.map(v=>`<td>${(v/1000).toFixed(1)}k€</td>`).join('')}<td class="tot-col" style="background:#f0f4ff;color:var(--sub)">${((p.tot_cost/mitjaFw)/1000).toFixed(1)}k€</td><td class="tot-col" style="font-weight:700">${(p.tot_cost/1000).toFixed(1)}k€</td></tr>`;
+    th+='</tbody></table>';
+    document.getElementById('ph-taula').innerHTML=th;
+
+    dk('cpd');
+    charts['cpd']=new Chart(document.getElementById('c-pd').getContext('2d'),{
+      type:'bar',
+      data:{labels:DIES,datasets:[
+        {label:'Cuina',data:p.avg_dia_hcoc,backgroundColor:col+'cc',borderRadius:3,borderSkipped:false,stack:'h'},
+        {label:'Sala',data:p.avg_dia_hsal,backgroundColor:col+'55',borderRadius:3,borderSkipped:false,stack:'h'},
+      ]},
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:true,position:'bottom',labels:{font:{size:9},boxWidth:9,padding:5}}},
+        scales:{x:{stacked:true,grid:{display:false},ticks:{font:{size:10}},categoryPercentage:0.6,barPercentage:0.8},y:{stacked:true,grid:{color:'rgba(0,0,0,0.03)'},ticks:{font:{size:8},callback:v=>v+'h'}}}
+      }
+    });
+  },50);
+}
+
+function tornTaula(p,col){
+  const torns=['Matí','Migdia','Tarda','Nit'];
+  const actius=torns.filter(t=>(p.torn_coc[t]||0)+(p.torn_sal[t]||0)>0);
+  const totVacCoc=(p.fw_hvac_coc||[]).reduce((a,b)=>a+b,0);
+  const totVacSal=(p.fw_hvac_sal||[]).reduce((a,b)=>a+b,0);
+  const dv=DV[curPer];
+  const hmV=dv?dv.heatmap:null;
+  const totV=dv?dv.total_vendes:0;
+  return`<table class="tbl">
+    <thead><tr><th>Torn</th><th>Cuina</th><th>Sala</th><th>Total</th>${hmV?'<th>Ràtio P/V</th>':''}</tr></thead>
+    <tbody>${actius.map(t=>{
+      const c=p.torn_coc[t]||0,s=p.torn_sal[t]||0,tot=c+s;
+      const cost=tot*COSTE_HORA;
+      const vTorn=hmV&&hmV[t]?hmV[t].reduce((a,b)=>a+b,0):0;
+      const ratio=vTorn>0?parseFloat((cost/vTorn*100).toFixed(1)):null;
+      const ratioCell=hmV&&ratio!==null?`<td style="font-weight:700;color:${rc(ratio)}">${ratio}%</td>`:'<td>—</td>';
+      return`<tr><td>${t}</td><td>${fmt(c)}h</td><td>${fmt(s)}h</td><td style="font-weight:700">${fmt(tot)}h</td>${ratioCell}</tr>`;
+    }).join('')}
+    <tr style="background:rgba(0,0,0,0.02)"><td style="font-weight:700">Total</td><td style="font-weight:700">${fmt(p.tot_hcoc)}h</td><td style="font-weight:700">${fmt(p.tot_hsal)}h</td><td style="font-weight:700">${fmt(p.tot_h)}h</td>${hmV?`<td style="font-weight:700;color:${rc(p.tot_cost/totV*100)}">${pc(p.tot_cost/totV*100)}</td>`:''}</tr>
+    <tr style="background:#f5f5f7"><td style="color:#aaa;font-size:9px">Vac. Cuina</td><td style="color:#aaa;font-size:9px">${totVacCoc>0?totVacCoc.toFixed(1)+'h':'—'}</td><td style="color:#aaa;font-size:9px">—</td><td style="color:#aaa;font-size:9px">${totVacCoc>0?totVacCoc.toFixed(1)+'h':'—'}</td>${hmV?'<td></td>':''}</tr>
+    <tr style="background:#f5f5f7"><td style="color:#aaa;font-size:9px">Vac. Sala</td><td style="color:#aaa;font-size:9px">—</td><td style="color:#aaa;font-size:9px">${totVacSal>0?totVacSal.toFixed(1)+'h':'—'}</td><td style="color:#aaa;font-size:9px">${totVacSal>0?totVacSal.toFixed(1)+'h':'—'}</td>${hmV?'<td></td>':''}</tr>
+    </tbody></table>`;
+}
+
+function horesDiaTaula(p,col){
+  const totDia=p.avg_dia_hcoc.map((c,i)=>c+(p.avg_dia_hsal[i]||0));
+  const totVacCoc=(p.fw_hvac_coc||[]).reduce((a,b)=>a+b,0);
+  const totVacSal=(p.fw_hvac_sal||[]).reduce((a,b)=>a+b,0);
+  const nFw=p.fw_list?p.fw_list.length:15;
+  return`<table class="dtbl"><thead><tr>
+    <th></th>${DIES.map(d=>`<th>${d}</th>`).join('')}
+    <th class="tot-col" style="background:#f0f4ff;font-size:8px">Mitja/fw</th>
+    <th class="tot-col" style="font-size:8px">Total acum.</th>
+  </tr></thead><tbody>
+    <tr><td style="color:${col};font-weight:700">Cuina</td>${p.avg_dia_hcoc.map(v=>`<td>${v>0?v+'h':'—'}</td>`).join('')}<td class="tot-col" style="background:#f0f4ff;color:var(--sub)">${Math.round(p.tot_hcoc/nFw)}h</td><td class="tot-col" style="font-weight:700">${fmt(p.tot_hcoc)}h</td></tr>
+    <tr><td style="color:${col}99;font-weight:700">Sala</td>${p.avg_dia_hsal.map(v=>`<td>${v>0?v+'h':'—'}</td>`).join('')}<td class="tot-col" style="background:#f0f4ff;color:var(--sub)">${Math.round(p.tot_hsal/nFw)}h</td><td class="tot-col" style="font-weight:700">${fmt(p.tot_hsal)}h</td></tr>
+    <tr style="border-top:.5px solid var(--sep);background:rgba(0,0,0,0.02)"><td style="font-weight:700">Total</td>${totDia.map(t=>`<td style="font-weight:700">${t>0?t+'h':'—'}</td>`).join('')}<td class="tot-col" style="background:#f0f4ff;font-weight:700;color:var(--sub)">${Math.round(p.tot_h/nFw)}h</td><td class="tot-col" style="font-weight:700">${fmt(p.tot_h)}h</td></tr>
+    <tr style="background:#f5f5f7"><td style="color:#aaa;font-size:9px">Vac. Cuina</td>${DIES.map(()=>`<td style="color:#aaa;font-size:9px">—</td>`).join('')}<td class="tot-col" style="background:#eeeeee;color:#aaa;font-size:9px">${totVacCoc>0?(totVacCoc/nFw).toFixed(1)+'h':'—'}</td><td class="tot-col" style="color:#aaa;font-size:9px">${totVacCoc>0?totVacCoc.toFixed(1)+'h':'—'}</td></tr>
+    <tr style="background:#f5f5f7"><td style="color:#aaa;font-size:9px">Vac. Sala</td>${DIES.map(()=>`<td style="color:#aaa;font-size:9px">—</td>`).join('')}<td class="tot-col" style="background:#eeeeee;color:#aaa;font-size:9px">${totVacSal>0?(totVacSal/nFw).toFixed(1)+'h':'—'}</td><td class="tot-col" style="color:#aaa;font-size:9px">${totVacSal>0?totVacSal.toFixed(1)+'h':'—'}</td></tr>
+  </tbody></table>`;
+}
+
+function renderLocVendesDetail(loc, col){
+  const el = document.getElementById('loc-vendes-detail');
+  if(!el || !LD.locals[loc]) return;
+  const d = LD.locals[loc];
+  const fws = LD.weeks.map(w=>'fw'+w);
+
+  let html = `
+  <div class="card" style="margin-top:8px">
+    <div class="ch" style="background:${col}18;flex-direction:column;gap:6px;align-items:flex-start">
+      <span class="ct" style="color:${col}">Vendes per família i article · evolució setmanal</span>
+      <div style="display:flex;gap:4px;flex-wrap:wrap;width:100%">
+        <div class="seg" style="flex:1">
+          <button class="sb active" id="lv-sec-fam" onclick="lvSec('fam','${loc}','${col}')">Famílies</button>
+          <button class="sb" id="lv-sec-men" onclick="lvSec('men','${loc}','${col}')">🍽 Menjar</button>
+          <button class="sb" id="lv-sec-pos" onclick="lvSec('pos','${loc}','${col}')">🍮 Postres</button>
+          <button class="sb" id="lv-sec-beg" onclick="lvSec('beg','${loc}','${col}')">🍺 Begudes</button>
+        </div>
+      </div>
+      <div style="display:flex;gap:4px">
+        <button class="sb active" id="lv-unit-uni" onclick="lvUnit('uni','${loc}','${col}')">Unitats</button>
+        <button class="sb" id="lv-unit-eur" onclick="lvUnit('eur','${loc}','${col}')">Euros</button>
+      </div>
+    </div>
+    <div class="cb" style="padding:4px 0 0;overflow-x:auto">
+      <div id="lv-taula"></div>
+    </div>
+  </div>`;
+  el.innerHTML = html;
+  lvRender('fam','uni',loc,col);
+}
+
+let _lvSec='fam', _lvUnit='uni';
+
+function lvSec(sec,loc,col){
+  _lvSec=sec;
+  ['fam','men','pos','beg'].forEach(s=>{ const b=document.getElementById('lv-sec-'+s); if(b) b.classList.toggle('active',s===sec); });
+  lvRender(sec,_lvUnit,loc,col);
+}
+function lvUnit(unit,loc,col){
+  _lvUnit=unit;
+  ['uni','eur'].forEach(u=>{ const b=document.getElementById('lv-unit-'+u); if(b) b.classList.toggle('active',u===unit); });
+  lvRender(_lvSec,unit,loc,col);
+}
+
+function lvRender(sec, unit, loc, col){
+  const el = document.getElementById('lv-taula');
+  if(!el || !LD.locals[loc]) return;
+  const d = LD.locals[loc];
+  const fws = LD.weeks.map(w=>'fw'+w);
+  const isEur = unit==='eur';
+
+  let items, dataObj, mitjaObj;
+  if(sec==='fam'){
+    items = d.fam.order;
+    dataObj = isEur ? d.fam.eur : d.fam.uni;
+    mitjaObj = isEur ? d.fam.mitja_eur : d.fam.mitja_uni;
+  } else {
+    const secMap = {men:'MENJAR',pos:'POSTRES',beg:'BEGUDES'};
+    const s = secMap[sec];
+    items = d.art[s].order;
+    dataObj = isEur ? d.art[s].eur : d.art[s].uni;
+    mitjaObj = isEur ? d.art[s].mitja_eur : d.art[s].mitja_uni;
+  }
+
+  function cellColor(val, mitja){
+    if(mitja===0) return '';
+    const p = (val-mitja)/mitja;
+    if(p>0.20) return 'background:#2E7D32;color:#fff';
+    if(p>0.10) return 'background:#81C784;color:#1B5E20';
+    if(p>=-0.10) return 'background:#FFF9C4;color:#5D4037';
+    if(p>=-0.20) return 'background:#FFB74D;color:#4E2600';
+    return 'background:#C62828;color:#fff';
+  }
+  function wkCol(w){ return w<=4?'#1A5276':w<=9?'#1A7A5E':'#5B3A8C'; }
+
+  const MITJA_LEFT = 130, ACUM_LEFT = 176;
+  let tbl = `<table style="border-collapse:collapse;font-size:9px;width:100%">
+    <thead><tr>
+      <th style="text-align:left;padding:3px 6px;position:sticky;left:0;z-index:3;background:#fff;min-width:130px;font-size:8px;color:var(--sub)">Article / Família</th>
+      <th style="padding:3px 4px;text-align:right;font-size:8px;color:var(--sub);white-space:nowrap;position:sticky;left:${MITJA_LEFT}px;z-index:3;background:#fff;border-right:.5px solid var(--sep)">Mitja/fw</th>
+      <th style="padding:3px 4px;text-align:right;font-size:8px;color:var(--sub);white-space:nowrap;position:sticky;left:${ACUM_LEFT}px;z-index:3;background:#f5f5f7;min-width:50px;border-right:1px solid var(--sep)">Acum.</th>`;
+  fws.forEach((fw,i)=>{ tbl+=`<th style="padding:2px 3px;text-align:right;background:${wkCol(LD.weeks[i])};color:#fff;font-size:8px;min-width:28px">${fw}</th>`; });
+  tbl+=`</tr></thead><tbody>`;
+
+  items.forEach((item,ri)=>{
+    const vals = dataObj[item] || [];
+    const mitja = mitjaObj[item] || 0;
+    const acum = vals.reduce((a,b)=>a+b,0);
+    const bgCol = ri%2===0?'#fff':'#f8f8f8';
+    const bgAcum = ri%2===0?'#f5f5f7':'#ececf0';
+    tbl+=`<tr><td style="padding:3px 6px;font-weight:600;font-size:8.5px;position:sticky;left:0;z-index:2;background:${bgCol};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px">${item}</td>`;
+    tbl+=`<td style="padding:3px 4px;text-align:right;font-weight:700;font-size:8px;position:sticky;left:${MITJA_LEFT}px;z-index:2;background:${bgCol};border-right:.5px solid var(--sep)">${isEur?fmt(Math.round(mitja))+'€':fmt(Math.round(mitja))}</td>`;
+    tbl+=`<td style="padding:3px 4px;text-align:right;font-weight:700;font-size:8px;position:sticky;left:${ACUM_LEFT}px;z-index:2;background:${bgAcum};border-right:1px solid var(--sep)">${isEur?fmt(Math.round(acum))+'€':fmt(Math.round(acum))}</td>`;
+    vals.forEach((v,wi)=>{
+      const style = cellColor(v, mitja);
+      tbl+=`<td style="padding:2px 3px;text-align:right;font-size:8px;${style}">${isEur?fmt(Math.round(v))+'€':fmt(v)}</td>`;
+    });
+    tbl+=`</tr>`;
+  });
+
+  if(isEur){
+    if(sec!=='fam'){
+      const secKey = {men:'MENJAR',pos:'POSTRES',beg:'BEGUDES'}[sec];
+      const topN = {MENJAR:40, POSTRES:8, BEGUDES:20}[secKey];
+      const locIdx = LOCS.indexOf(loc);
+      const k = ['sar','sbd','psb','psc'][locIdx] || 'sar';
+      const pct = PD.cov[k+'_'+secKey]||0;
+      const cls = pct>=80?'ok':pct>=60?'warn':'bad';
+      tbl+=`<tr style="border-top:1px solid var(--sep);background:rgba(0,0,0,.03)">
+        <td style="position:sticky;left:0;z-index:2;background:rgba(245,245,245,1);padding:3px 6px;font-size:8px;font-weight:600;color:var(--sub)">% cobertura vendes</td>
+        <td style="position:sticky;left:${MITJA_LEFT}px;z-index:2;background:rgba(240,240,240,1);text-align:right;font-size:9px;font-weight:700;color:var(--${cls});border-right:.5px solid var(--sep)">${pct}%</td>
+        <td style="position:sticky;left:${ACUM_LEFT}px;z-index:2;background:rgba(236,236,240,1);border-right:1px solid var(--sep)"></td>
+        <td colspan="${fws.length}" style="font-size:8px;color:var(--sub);padding:3px 6px">vendes top ${topN} / vendes totals secció</td>
+      </tr>`;
+    } else {
+      const locIdx = LOCS.indexOf(loc);
+      const k = ['sar','sbd','psb','psc'][locIdx] || 'sar';
+      // Cobertura famílies (veiem totes → 100%)
+      const pctF = PD.cov[k+'_FAM']||100;
+      const clsF = pctF>=80?'ok':pctF>=60?'warn':'bad';
+      tbl+=`<tr style="border-top:1px solid var(--sep);background:rgba(0,0,0,.03)">
+        <td style="position:sticky;left:0;z-index:2;background:rgba(245,245,245,1);padding:3px 6px;font-size:8px;font-weight:600;color:var(--sub)">📦 Cob. Famílies</td>
+        <td style="position:sticky;left:${MITJA_LEFT}px;z-index:2;background:rgba(240,240,240,1);text-align:right;font-size:9px;font-weight:700;color:var(--${clsF});border-right:.5px solid var(--sep)">${pctF}%</td>
+        <td style="position:sticky;left:${ACUM_LEFT}px;z-index:2;background:rgba(236,236,240,1);border-right:1px solid var(--sep)"></td>
+        <td colspan="${fws.length}" style="font-size:8px;color:var(--sub);padding:3px 6px">totes les famílies visibles</td>
+      </tr>`;
+      // Cobertura per secció
+      [['MENJAR','🍽',40],['POSTRES','🍮',8],['BEGUDES','🍺',20]].forEach(([secKey,ic,topN])=>{
+        const pct = PD.cov[k+'_'+secKey]||0;
+        const cls = pct>=80?'ok':pct>=60?'warn':'bad';
+        tbl+=`<tr style="background:rgba(0,0,0,.02)">
+          <td style="position:sticky;left:0;z-index:2;background:rgba(248,248,248,1);padding:3px 6px;font-size:8px;color:var(--sub)">${ic} Cob. ${secKey.charAt(0)+secKey.slice(1).toLowerCase()}</td>
+          <td style="position:sticky;left:${MITJA_LEFT}px;z-index:2;background:rgba(245,245,245,1);text-align:right;font-size:9px;font-weight:700;color:var(--${cls});border-right:.5px solid var(--sep)">${pct}%</td>
+          <td style="position:sticky;left:${ACUM_LEFT}px;z-index:2;background:rgba(242,242,242,1);border-right:1px solid var(--sep)"></td>
+          <td colspan="${fws.length}" style="font-size:8px;color:var(--sub);padding:3px 6px">vendes top ${topN} / vendes totals</td>
+        </tr>`;
+      });
+    }
+  }
+
+  tbl+=`</tbody></table>`;
+  el.innerHTML = tbl;
+}
+
+renderResum();
+
+const PROD_LOCS=['SM Sarrià','SM Sabadell','Picu Sabadell','Picu StCugat'];
+const PROD_COLS={'SM Sarrià':'#1F3864','SM Sabadell':'#1E6B3C','Picu Sabadell':'#7B3F00','Picu StCugat':'#5B4A8A'};
+const PROD_KEYS=['sar','sbd','psb','psc'];
+const PROD_SHORT={'SM Sarrià':'S.Sarrià','SM Sabadell':'S.Sbd','Picu Sabadell':'P.Sbd','Picu StCugat':'P.StC'};
+let curProdSec='articles';
+
+function showProdSec(sec){curProdSec=sec;document.querySelectorAll('#prod-seg .sb').forEach(b=>b.classList.remove('active'));event.target.classList.add('active');renderProductes();}
+function fmtK(v){return v>=1000?(v/1000).toFixed(1)+'k':v;}
+function r2Badge(r2,slope){const dir=slope>0?'▲ pujant':'▼ baixant';if(r2>0.5)return`<span style="color:#1a7a37;font-weight:700">🟢 ${dir}</span>`;if(r2>0.2)return`<span style="color:#b36b00;font-weight:700">🟡 ${dir}</span>`;return`<span style="color:#8e8e93;font-weight:700">🔴 dispersió alta</span>`;}
+function renderProductes(){const el=document.getElementById('prod-detail');if(!el)return;if(curProdSec==='articles')el.innerHTML=renderProdArticles();else el.innerHTML=renderProdFamilies();setTimeout(()=>{if(curProdSec==='families')initFamiliesChart();},0);}
+
+function renderProdArticles(){
+  if(typeof _artUnit==='undefined') window._artUnit='eur';
+  const isEur=_artUnit==='eur';
+  const visLocs = (SESSION&&SESSION.local) ? PROD_LOCS.filter(l=>l===SESSION.local) : PROD_LOCS;
+  const visKeys = visLocs.map(l=>PROD_KEYS[PROD_LOCS.indexOf(l)]);
+  const visCols = visLocs.map(l=>PROD_COLS[l]);
+  const visShort = visLocs.map(l=>PROD_SHORT[l]);
+  function covClass(pct){return pct>=80?'ok':pct>=60?'warn':'bad';}
+  function artRows(list, secKey){
+    const secTotal=list.reduce((s,a)=>s+a.tot,0);
+    const maxTot=list[0]?.tot||1;
+    const rows=list.map(a=>{
+      const pctTot=secTotal>0?Math.round(a.tot/secTotal*100):0;
+      const bars=visLocs.map((l,i)=>{const v=a[visKeys[i]];if(!v)return'';return`<div style="width:${Math.round(v/maxTot*100)}%;background:${visCols[i]}99;height:100%"></div>`;}).join('');
+      let vals;
+      if(isEur){
+        vals=visLocs.map((l,i)=>`<td style="text-align:right;font-size:8px;color:${visCols[i]}">${a[visKeys[i]]>0?fmt(a[visKeys[i]])+'€':'—'}</td>`).join('');
+      } else {
+        vals=visLocs.map((l,i)=>{
+          const d=LD&&LD.locals[l];
+          let uni=null;
+          if(d){
+            for(const s2 of ['MENJAR','POSTRES','BEGUDES']){
+              if(d.art&&d.art[s2]&&d.art[s2].mitja_uni&&d.art[s2].mitja_uni[a.art]!==undefined){
+                uni=Math.round(d.art[s2].mitja_uni[a.art]);break;
+              }
+            }
+          }
+          return`<td style="text-align:right;font-size:8px;color:${visCols[i]}">${uni!==null?uni:'—'}</td>`;
+        }).join('');
+      }
+      const totVal=isEur?fmt(a.tot)+'€':'—';
+      return`<tr>
+        <td style="max-width:100px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:9px;font-weight:600">${a.art}</td>
+        ${vals}
+        <td style="padding:3px 4px;min-width:40px"><div style="display:flex;height:8px;border-radius:3px;overflow:hidden;background:#eee">${bars}</div></td>
+        <td style="text-align:right;font-weight:700;font-size:9px">${totVal}</td>
+        <td style="text-align:right;font-size:8px;color:var(--sub)">${pctTot}%</td>
+      </tr>`;
+    }).join('');
+    const covVals=visLocs.map((l,i)=>{const p=PD.cov[visKeys[i]+'_'+secKey]||0;const c=covClass(p);return`<td style="text-align:right;font-size:9px;font-weight:700;color:var(--${c})">${p}%</td>`;}).join('');
+    const topNlbl={MENJAR:40,POSTRES:8,BEGUDES:20}[secKey]||'';
+    const covRow=`<tr style="border-top:1px solid var(--sep);background:rgba(0,0,0,.03)">
+      <td style="font-size:8px;font-weight:600;color:var(--sub)">% cob. vendes top ${topNlbl}</td>
+      ${covVals}<td></td><td></td><td></td></tr>`;
+    return rows+covRow;
+  }
+  const locHdrs=visLocs.map((l,i)=>`<th style="color:${visCols[i]};font-size:8px;min-width:44px;width:44px;text-align:right">${visShort[i]}</th>`).join('');
+  const legend=visLocs.map((l,i)=>`<span style="font-size:8px;color:${visCols[i]};font-weight:600">■ ${visShort[i]}</span>`).join(' ');
+  const ctrlBar=`<div style="display:flex;gap:8px;margin-top:4px;flex-wrap:wrap">
+    <div style="display:flex;gap:3px">
+      <button class="sb${isEur?' active':''}" onclick="setArtUnit('eur')">\u20AC Euros</button>
+      <button class="sb${!isEur?' active':''}" onclick="setArtUnit('uni')">Unitats</button>
+    </div>
+  </div>`;
+  const seccions=[{label:'🍽 Menjar',list:PD.top_menjar,key:'MENJAR',color:'#1A3A5C'},{label:'🍮 Postres',list:PD.top_postres,key:'POSTRES',color:'#6E2F1A'},{label:'🍺 Begudes',list:PD.top_begudes,key:'BEGUDES',color:'#1A5C3A'}];
+  return seccions.map((s,i)=>`
+    <div class="card" style="margin-top:${i===0?4:0}px">
+      <div class="ch" style="flex-direction:column;align-items:flex-start;gap:4px">
+        <div style="display:flex;align-items:center;justify-content:space-between;width:100%">
+          <span class="ct" style="color:${s.color}">${s.label} · mitja setmanal</span>
+          ${i===0?ctrlBar:''}
+        </div>
+        <div style="font-size:8px;color:var(--sub)">${legend}</div>
+      </div>
+      <div class="cb" style="padding:4px 8px 8px;overflow-x:auto">
+        <table class="dtbl" style="width:100%;table-layout:fixed">
+          <thead><tr>
+            <th style="text-align:left;width:120px">Article</th>
+            ${locHdrs}
+            <th style="min-width:30px"></th>
+            <th style="min-width:44px;text-align:right">Total</th>
+            <th style="min-width:32px;text-align:right;color:var(--sub)">%</th>
+          </tr></thead>
+          <tbody>${artRows(s.list,s.key)}</tbody>
+        </table>
+      </div>
+    </div>`).join('');
+}
+
+function renderProdFamilies(){
+  if(typeof _famUnit==='undefined') window._famUnit='eur';
+  const isEur=_famUnit==='eur';
+  const visLocs = (SESSION&&SESSION.local) ? PROD_LOCS.filter(l=>l===SESSION.local) : PROD_LOCS;
+  const visKeys = visLocs.map(l=>PROD_KEYS[PROD_LOCS.indexOf(l)]);
+  const visCols = visLocs.map(l=>PROD_COLS[l]);
+  const visShort = visLocs.map(l=>PROD_SHORT[l]);
+  const maxVal=Math.max(...PD.fam_comp.map(f=>visLocs.reduce((s,l,i)=>s+f[visKeys[i]],0)));
+  const totPerLoc=visLocs.map((l,i)=>PD.fam_comp.reduce((s,f)=>s+f[visKeys[i]],0));
+  const totGeneral=PD.fam_comp.reduce((s,f)=>s+visLocs.reduce((ss,l,i)=>ss+f[visKeys[i]],0),0);
+  const rows=PD.fam_comp.map(f=>{
+    const tot=visLocs.reduce((s,l,i)=>s+f[visKeys[i]],0);
+    const pctTotal=totGeneral>0?Math.round(tot/totGeneral*100):0;
+    const bars=visLocs.map((l,i)=>{const v=f[visKeys[i]];if(!v)return'';return`<div style="width:${Math.round(v/maxVal*100)}%;background:${visCols[i]}bb;height:100%"></div>`;}).join('');
+    const vals=visLocs.map((l,i)=>`<td style="text-align:right;font-size:8px;color:${visCols[i]}">${f[visKeys[i]]>0?fmt(f[visKeys[i]])+(isEur?'€':''):'—'}</td>`).join('');
+    return`<tr>
+      <td style="font-size:9px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:80px">${f.fam}</td>
+      <td style="padding:3px 3px;min-width:50px"><div style="display:flex;height:10px;border-radius:3px;overflow:hidden;background:#f0f0f0">${bars}</div></td>
+      ${vals}
+      <td style="text-align:right;font-weight:700;font-size:9px">${fmt(tot)}${isEur?'€':''}</td>
+      <td style="text-align:right;font-size:8px;color:var(--sub)">${pctTotal}%</td>
+    </tr>`;
+  }).join('');
+  const locHdrs=visLocs.map((l,i)=>`<th style="color:${visCols[i]};font-size:8px;min-width:44px;width:44px;text-align:right">${visShort[i]}</th>`).join('');
+  const legend=visLocs.map((l,i)=>`<span style="font-size:8px;color:${visCols[i]};font-weight:600">■ ${visShort[i]}</span>`).join(' ');
+  const totRow=`<tr style="border-top:1px solid var(--sep);background:rgba(0,0,0,.03)">
+    <td style="font-size:9px;font-weight:700">TOTAL</td><td></td>
+    ${visLocs.map((l,i)=>`<td style="text-align:right;font-size:9px;font-weight:700;color:${visCols[i]}">${fmt(totPerLoc[i])}${isEur?'€':''}</td>`).join('')}
+    <td style="text-align:right;font-weight:700;font-size:9px">${fmt(totGeneral)}${isEur?'€':''}</td>
+    <td style="text-align:right;font-size:8px;color:var(--sub)">100%</td>
+  </tr>`;
+  function covRow(secKey){
+    const pctsLoc=visLocs.map((l,i)=>PD.cov[visKeys[i]+'_'+secKey]||0);
+    const mitjaCov=Math.round(pctsLoc.reduce((a,b)=>a+b,0)/pctsLoc.length);
+    const cls=mitjaCov>=80?'ok':mitjaCov>=60?'warn':'bad';
+    const cels=visLocs.map((l,i)=>{const p=pctsLoc[i];const c2=p>=80?'ok':p>=60?'warn':'bad';return`<td style="text-align:right;font-size:9px;font-weight:700;color:var(--${c2})">${p}%</td>`;}).join('');
+    const labels={FAM:'📦 Cob. Famílies (totes)', MENJAR:'🍽 Cob. Menjar (top 40)', POSTRES:'🍮 Cob. Postres (top 8)', BEGUDES:'🍺 Cob. Begudes (top 20)'};
+    return`<tr style="background:rgba(0,0,0,.02)">
+      <td style="font-size:8px;font-weight:600;color:var(--sub)">${labels[secKey]||secKey}</td>
+      <td></td>${cels}
+      <td style="text-align:right;font-size:9px;font-weight:700;color:var(--${cls})">${mitjaCov}%</td>
+      <td></td>
+    </tr>`;
+  }
+  const unitSel=`<div style="display:flex;gap:4px;margin-top:4px">
+    <button class="sb${isEur?' active':''}" onclick="setFamUnit('eur')">\u20AC Euros</button>
+    <button class="sb${!isEur?' active':''}" onclick="setFamUnit('uni')">Unitats</button>
+  </div>`;
+  return`<div class="card" style="margin-top:4px">
+    <div class="ch" style="flex-direction:column;align-items:flex-start;gap:4px">
+      <div style="display:flex;align-items:center;justify-content:space-between;width:100%">
+        <span class="ct">Vendes per família · mitja setmanal</span>
+        ${unitSel}
+      </div>
+      <div style="font-size:8px;color:var(--sub);display:flex;gap:6px;flex-wrap:wrap">${legend}</div>
+    </div>
+    <div class="cb" style="padding:4px 8px 8px">
+      <table class="dtbl" style="width:100%">
+        <thead><tr><th style="text-align:left">Família</th><th></th>${locHdrs}<th>Total</th><th>%</th></tr></thead>
+        <tbody>${rows}${totRow}${covRow('FAM')}${covRow('MENJAR')}${covRow('POSTRES')}${covRow('BEGUDES')}</tbody>
+      </table>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ch"><span class="ct">Comparativa visual · top 8 famílies</span></div>
+    <div class="cb" style="padding:6px 4px 8px"><div style="position:relative;height:220px"><canvas id="c-prod-fam"></canvas></div></div>
+  </div>`;
+}
+function initFamiliesChart(){const ctx=document.getElementById('c-prod-fam');if(!ctx)return;if(charts['pf'])charts['pf'].destroy();const top8=PD.fam_comp.slice(0,8);charts['pf']=new Chart(ctx,{type:'bar',data:{labels:top8.map(f=>f.fam),datasets:PROD_LOCS.map((l,i)=>({label:PROD_SHORT[l],data:top8.map(f=>f[PROD_KEYS[i]]),backgroundColor:PROD_COLS[l]+'cc'}))},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:9},boxWidth:10}}},scales:{x:{ticks:{font:{size:8},maxRotation:30}},y:{ticks:{font:{size:9},callback:v=>v+'€'}}}}});}
+function setArtUnit(u){window._artUnit=u;document.getElementById('prod-detail').innerHTML=renderProdArticles();}
+function setFamUnit(u){window._famUnit=u;document.getElementById('prod-detail').innerHTML=renderProdFamilies();setTimeout(initFamiliesChart,0);}
+
+initAuth();
+</script>
+</body>
+</html>
